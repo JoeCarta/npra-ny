@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Agenda-NY Newsletter — NPRA New York Chapter</title>
+  <meta name="description" content="La Agenda-NY is the official newsletter of the National Puerto Rican Agenda New York Chapter. Browse past issues and subscribe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="bg-wrap"></div>
+  <div class="noise"></div>
+
+  <!-- Header -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo" aria-label="NPRA New York Chapter — Home">
+          <img src="assets/images/NPRAflag.png" alt="NPRA Flag Logo" />
+          <span class="logo-text">NEW YORK CHAPTER</span>
+        </a>
+
+        <nav class="nav" aria-label="Primary">
+          <a href="index.html#our-story">About Us</a>
+          <a href="newsletter.html" class="active">La Agenda</a>
+          <a href="members.html">Members</a>
+          <a href="join.html">Join Us</a>
+        </nav>
+
+        <div class="actions">
+          <a href="index.html#donate" class="btn btn-primary">Donate</a>
+          <button class="mobile-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" style="display:none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="container">
+        <div class="mobile-links">
+          <a href="index.html#our-story" onclick="closeMobileMenu()">About Us</a>
+          <a href="newsletter.html" onclick="closeMobileMenu()">La Agenda</a>
+          <a href="members.html" onclick="closeMobileMenu()">Members</a>
+          <a href="join.html" onclick="closeMobileMenu()">Join Us</a>
+          <a href="index.html#donate" onclick="closeMobileMenu()">Donate</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header" id="top">
+    <div class="container">
+      <div class="page-header-content reveal">
+        <div class="eyebrow">Newsletter</div>
+        <img src="assets/images/La_Agenda_Banner_White.png" class="page-nl-logo" alt="La Agenda NY" />
+        <p class="lead" style="max-width: 54ch;">The official newsletter of NPRA-NY — updates on community initiatives, advocacy, and ways to take action.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Archive -->
+  <section class="section" id="archive">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Archive</div>
+        <div class="h2">Past Issues</div>
+        <div class="lead">Browse our newsletter archive. Each issue reflects the work, voices, and priorities of the NPRA-NY community.</div>
+      </div>
+
+      <div class="nl-archive-grid">
+
+        <article class="nl-archive-card nl-featured reveal">
+          <div class="nl-archive-meta">
+            <span class="nl-archive-date">October 21, 2025</span>
+            <span class="nl-archive-issue">NYC Chapter &middot; Issue #18</span>
+          </div>
+          <h2 class="nl-archive-title">Save the Date: NPRA National Community Reinvestment Summit &mdash; Lancaster, PA</h2>
+          <p class="nl-archive-body">Join us as we gather Puerto Rican community leadership, activists, professionals, and elected officials. NPRA will host a National Community Reinvestment Summit, culminating in our Bi-Annual Convention on Saturday, April 11, 2026. Arrive Thursday April 9th and depart Saturday April 11th. This two-and-a-half-day gathering will convene top Puerto Rican leadership for action-oriented conversations on community reinvestment. Registration, agenda highlights, and lodging details to follow.</p>
+          <div class="nl-archive-tags">
+            <span class="nl-archive-tag">Summit</span>
+            <span class="nl-archive-tag">Convention</span>
+            <span class="nl-archive-tag">Lancaster PA</span>
+          </div>
+          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
+        </article>
+
+        <article class="nl-archive-card reveal">
+          <div class="nl-archive-meta">
+            <span class="nl-archive-date">December 2025</span>
+            <span class="nl-archive-issue">NYC Chapter &middot; Issue #17</span>
+          </div>
+          <h2 class="nl-archive-title">Year-End Recap + 2026 Priorities</h2>
+          <p class="nl-archive-body">A look back at what we accomplished in 2025 — 9 civic education workshops across NYC, an expanded partner network of 26 community orgs, and a new rapid-response volunteer roster — plus our focus areas heading into the new year.</p>
+          <div class="nl-archive-tags">
+            <span class="nl-archive-tag">Recap</span>
+            <span class="nl-archive-tag">Strategy</span>
+          </div>
+          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
+        </article>
+
+        <article class="nl-archive-card reveal">
+          <div class="nl-archive-meta">
+            <span class="nl-archive-date">November 2025</span>
+            <span class="nl-archive-issue">NYC Chapter &middot; Issue #16</span>
+          </div>
+          <h2 class="nl-archive-title">Civic Power: Voter Education Toolkit</h2>
+          <p class="nl-archive-body">We published a bilingual, plain-language toolkit covering registration, rights at the polls, and how to support neighbors with accessibility needs. Host a 30-minute info session, join a phonebank training, or help translate community materials.</p>
+          <div class="nl-archive-tags">
+            <span class="nl-archive-tag">Civic</span>
+            <span class="nl-archive-tag">Education</span>
+          </div>
+          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
+        </article>
+
+        <article class="nl-archive-card reveal">
+          <div class="nl-archive-meta">
+            <span class="nl-archive-date">October 2025</span>
+            <span class="nl-archive-issue">NYC Chapter &middot; Issue #15</span>
+          </div>
+          <h2 class="nl-archive-title">Disaster Readiness + Relief Coordination</h2>
+          <p class="nl-archive-body">Preparedness isn't panic &mdash; it's solidarity. Neighborhood-level checklists, trusted relief partners on the island and in NYC, supply sorting days, and a community briefing on FEMA resources and common pitfalls.</p>
+          <div class="nl-archive-tags">
+            <span class="nl-archive-tag">Relief</span>
+            <span class="nl-archive-tag">Preparedness</span>
+          </div>
+          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
+        </article>
+
+        <article class="nl-archive-card reveal">
+          <div class="nl-archive-meta">
+            <span class="nl-archive-date">September 2025</span>
+            <span class="nl-archive-issue">NYC Chapter &middot; Issue #14</span>
+          </div>
+          <h2 class="nl-archive-title">Meet the Chapter + Fall Events Calendar</h2>
+          <p class="nl-archive-body">We're welcoming new volunteers and launching a monthly "action hour" format &mdash; simple tasks, clear outcomes, real impact. Plus the full fall events calendar: community mixer, Advocacy 101 training, and neighborhood listening sessions.</p>
+          <div class="nl-archive-tags">
+            <span class="nl-archive-tag">Events</span>
+            <span class="nl-archive-tag">Onboarding</span>
+          </div>
+          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
+        </article>
+
+      </div>
+
+      <div class="divider reveal"></div>
+    </div>
+  </section>
+
+  <!-- Subscribe -->
+  <section class="section" id="subscribe">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Stay Connected</div>
+        <div class="h2">Get La Agenda in Your Inbox</div>
+        <div class="lead">Subscribe to receive the latest issue of La Agenda-NY directly in your inbox &mdash; updates on initiatives, events, and ways to take action.</div>
+      </div>
+      <form class="form reveal" onsubmit="handleNewsletterSubmit(event)">
+        <label class="sr-only" for="nl-email">Email address</label>
+        <input id="nl-email" type="email" placeholder="Enter your email" required class="input" />
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo" style="min-width:auto;">
+            <img src="assets/images/NPRAflag.png" alt="NPRA Flag Logo" style="height:40px;" />
+            <span class="logo-text" style="font-size:1.2rem;">NPRA</span>
+          </a>
+          <p style="margin-top: 0.9rem; max-width: 44ch;">
+            The National Puerto Rican Agenda unites change-makers to educate and create solutions for the Puerto Rican people.
+          </p>
+          <div class="social">
+            <a href="#" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="X">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Organization</h4>
+          <ul>
+            <li><a href="index.html#our-story">Our Story</a></li>
+            <li><a href="index.html#our-work">Our Mission</a></li>
+            <li><a href="index.html#initiatives">Our Work</a></li>
+            <li><a href="index.html#team">Our Team</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Get Involved</h4>
+          <ul>
+            <li><a href="join.html">Become a Member</a></li>
+            <li><a href="members.html">Events</a></li>
+            <li><a href="index.html#donate">Donate</a></li>
+            <li><a href="join.html">Volunteer</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="newsletter.html">La Agenda</a></li>
+            <li><a href="members.html#bulletin">Bulletin Board</a></li>
+            <li><a href="members.html#connect">Stay Connected</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 National Puerto Rican Agenda. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

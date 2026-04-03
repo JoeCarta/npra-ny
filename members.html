@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Members — NPRA New York Chapter</title>
+  <meta name="description" content="NPRA-NY member resources: upcoming events, bulletin board services, and ways to stay connected." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="bg-wrap"></div>
+  <div class="noise"></div>
+
+  <!-- Header -->
+  <header class="header scrolled" id="header">
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo" aria-label="NPRA New York Chapter — Home">
+          <img src="assets/images/NPRAflag.png" alt="NPRA Flag Logo" />
+          <span class="logo-text">NEW YORK CHAPTER</span>
+        </a>
+
+        <nav class="nav" aria-label="Primary">
+          <a href="index.html#our-story">About Us</a>
+          <a href="newsletter.html">La Agenda</a>
+          <a href="members.html" class="active">Members</a>
+          <a href="join.html">Join Us</a>
+        </nav>
+
+        <div class="actions">
+          <a href="index.html#donate" class="btn btn-primary">Donate</a>
+          <button class="mobile-btn" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" style="display:none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-drawer" id="mobile-drawer">
+      <div class="container">
+        <div class="mobile-links">
+          <a href="index.html#our-story" onclick="closeMobileMenu()">About Us</a>
+          <a href="newsletter.html" onclick="closeMobileMenu()">La Agenda</a>
+          <a href="members.html" onclick="closeMobileMenu()">Members</a>
+          <a href="join.html" onclick="closeMobileMenu()">Join Us</a>
+          <a href="index.html#donate" onclick="closeMobileMenu()">Donate</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <section class="page-header" id="top">
+    <div class="container">
+      <div class="page-header-content reveal">
+        <div class="eyebrow">Member Portal</div>
+        <div class="h2" style="font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; margin-bottom: 0.75rem;">Members</div>
+        <p class="lead" style="max-width: 52ch;">Events, services, and resources for NPRA-NY members and the broader Puerto Rican community.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events -->
+  <section class="section" id="events">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Calendar</div>
+        <div class="h2">Meetings, Parades &amp; Networking</div>
+        <div class="lead">Upcoming events open to members and the broader NPRA-NY community.</div>
+      </div>
+
+      <div class="events-list reveal">
+
+        <div class="event-row">
+          <div class="event-date-badge">
+            <span class="month">Apr</span>
+            <span class="day">9</span>
+          </div>
+          <div class="event-row-body">
+            <div class="event-row-title">NPRA National Community Reinvestment Summit</div>
+            <div class="event-row-meta">April 9&ndash;11, 2026 &middot; Lancaster, PA</div>
+          </div>
+          <span class="event-row-type">Convention</span>
+        </div>
+
+        <div class="event-row">
+          <div class="event-date-badge">
+            <span class="month">Jun</span>
+            <span class="day">8</span>
+          </div>
+          <div class="event-row-body">
+            <div class="event-row-title">National Puerto Rican Day Parade</div>
+            <div class="event-row-meta">June 8, 2026 &middot; Fifth Avenue, New York, NY</div>
+          </div>
+          <span class="event-row-type">Parade</span>
+        </div>
+
+        <div class="event-row">
+          <div class="event-date-badge">
+            <span class="month">TBD</span>
+            <span class="day">&mdash;</span>
+          </div>
+          <div class="event-row-body">
+            <div class="event-row-title">Chapter General Meeting</div>
+            <div class="event-row-meta">Date TBD &middot; New York, NY &middot; Virtual option available</div>
+          </div>
+          <span class="event-row-type">Meeting</span>
+        </div>
+
+        <div class="event-row">
+          <div class="event-date-badge">
+            <span class="month">TBD</span>
+            <span class="day">&mdash;</span>
+          </div>
+          <div class="event-row-body">
+            <div class="event-row-title">Community Networking Reception</div>
+            <div class="event-row-meta">Date TBD &middot; New York, NY</div>
+          </div>
+          <span class="event-row-type">Networking</span>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 1.5rem;" class="reveal">
+        <a href="join.html" class="btn">Become a member to receive event invitations &rarr;</a>
+      </div>
+
+      <div class="divider reveal"></div>
+    </div>
+  </section>
+
+  <!-- Bulletin Board -->
+  <section class="section" id="bulletin">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Bulletin Board</div>
+        <div class="h2">Member Services</div>
+        <div class="lead">A directory of associated member services available to the NPRA-NY community. Listings are provided by member organizations and affiliates.</div>
+      </div>
+
+      <div class="bulletin-grid">
+
+        <div class="bulletin-card reveal">
+          <div class="bulletin-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 4.608a12.218 12.218 0 0 1-2.46 3.85m-1.67 1.67c.97-.578 1.89-1.23 2.74-1.955m-2.74 1.955c.969-.578 1.89-1.23 2.74-1.955M9.75 17.25v-2.25a2.25 2.25 0 0 1 2.25-2.25h.75" />
+            </svg>
+          </div>
+          <h3>Legal Services</h3>
+          <p>Access to Puerto Rican and Hispanic legal professionals offering guidance on commercial real estate, contracts, immigration, tenant rights, and small business law.</p>
+          <a href="join.html" class="btn">Connect with Legal Resources</a>
+        </div>
+
+        <div class="bulletin-card reveal">
+          <div class="bulletin-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+          </div>
+          <h3>Real Estate</h3>
+          <p>Resources to help Puerto Rican and Latino families navigate the housing market, access affordable housing programs, and combat displacement in their communities.</p>
+          <a href="join.html" class="btn">Connect with Housing Resources</a>
+        </div>
+
+        <div class="bulletin-card reveal">
+          <div class="bulletin-card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-1.942 51 51 0 0 0-3.741 1.942z" />
+            </svg>
+          </div>
+          <h3>Scholarships &amp; Education</h3>
+          <p>Annual scholarships, mentorship programs, and educational resources supporting Puerto Rican students and emerging leaders across New York.</p>
+          <a href="join.html" class="btn">View Scholarship Resources</a>
+        </div>
+
+      </div>
+
+      <p class="lead" style="margin-top: 1.75rem; font-size: 0.92rem; opacity: 0.7;" class="reveal">
+        Are you a member organization offering services to our community? <a href="join.html" style="color: var(--accent); text-decoration: underline; text-underline-offset: 3px;">Contact us to be listed &rarr;</a>
+      </p>
+
+      <div class="divider reveal"></div>
+    </div>
+  </section>
+
+  <!-- Stay Connected -->
+  <section class="section" id="connect">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="eyebrow">Stay Connected</div>
+        <div class="h2">News, Events &amp; Collaboration</div>
+        <div class="lead">Multiple ways to stay engaged with NPRA-NY and the broader Puerto Rican community in New York.</div>
+      </div>
+
+      <div class="connect-grid">
+
+        <div class="connect-card reveal">
+          <div class="eyebrow" style="margin-bottom: 0.3rem;">Newsletter</div>
+          <h4>La Agenda-NY</h4>
+          <p>Get the latest on initiatives, advocacy wins, and community events delivered directly to your inbox. Published regularly by the NPRA-NY chapter.</p>
+          <a href="newsletter.html" class="btn">Browse &amp; Subscribe</a>
+        </div>
+
+        <div class="connect-card reveal">
+          <div class="eyebrow" style="margin-bottom: 0.3rem;">Events</div>
+          <h4>Calendar &amp; Meetings</h4>
+          <p>Members receive priority invitations to chapter meetings, community networking events, and parade coordination. Join to be the first to know.</p>
+          <a href="join.html" class="btn">Become a Member</a>
+        </div>
+
+        <div class="connect-card reveal">
+          <div class="eyebrow" style="margin-bottom: 0.3rem;">Collaborate</div>
+          <h4>Partner with Us</h4>
+          <p>Organizations, small businesses, and community leaders are welcome to partner with NPRA-NY. Let's build the alliances that drive real change together.</p>
+          <a href="join.html" class="btn">Get in Touch</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="logo" style="min-width:auto;">
+            <img src="assets/images/NPRAflag.png" alt="NPRA Flag Logo" style="height:40px;" />
+            <span class="logo-text" style="font-size:1.2rem;">NPRA</span>
+          </a>
+          <p style="margin-top: 0.9rem; max-width: 44ch;">
+            The National Puerto Rican Agenda unites change-makers to educate and create solutions for the Puerto Rican people.
+          </p>
+          <div class="social">
+            <a href="#" aria-label="Facebook">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="X">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Organization</h4>
+          <ul>
+            <li><a href="index.html#our-story">Our Story</a></li>
+            <li><a href="index.html#our-work">Our Mission</a></li>
+            <li><a href="index.html#initiatives">Our Work</a></li>
+            <li><a href="index.html#team">Our Team</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Get Involved</h4>
+          <ul>
+            <li><a href="join.html">Become a Member</a></li>
+            <li><a href="members.html">Events</a></li>
+            <li><a href="index.html#donate">Donate</a></li>
+            <li><a href="join.html">Volunteer</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="newsletter.html">La Agenda</a></li>
+            <li><a href="members.html#bulletin">Bulletin Board</a></li>
+            <li><a href="members.html#connect">Stay Connected</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 National Puerto Rican Agenda. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
