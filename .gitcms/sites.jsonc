@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "sites": [
+    {
+      "key": "puertoricanagenda",
+      "display_name": "Site",
+      "website_url": "https://www.puertoricanagenda.org/",
+      "root_path": ""
+    }
+  ]
+}

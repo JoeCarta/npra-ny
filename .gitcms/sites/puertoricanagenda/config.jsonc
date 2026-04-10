@@ -1,0 +1,15 @@
+{
+  "version": "1",
+  "media_path": "",
+  "frontmatter_format": "yaml",
+  "sitemap_url": "https://www.puertoricanagenda.org/sitemap.xml",
+  "publishing_mode": "editorial_workflow",
+  "collections": [
+    {
+      "name": "",
+      "git_path": "",
+      "file_extension": ".md",
+      "filename_pattern": ""
+    }
+  ]
+}
