@@ -78,77 +78,8 @@
         <div class="lead">Browse our newsletter archive. Each issue reflects the work, voices, and priorities of the NPRA-NY community.</div>
       </div>
 
-      <div class="nl-archive-grid">
-
-        <article class="nl-archive-card nl-featured reveal">
-          <div class="nl-archive-meta">
-            <span class="nl-archive-date">April 2026</span>
-            <span class="nl-archive-issue">NYC Chapter &middot; Issue #18</span>
-          </div>
-          <h2 class="nl-archive-title">"¡No a Esencia!" Echoed With Solidarity and Pride as NY-based Puerto Ricans Join the Call for Civil Resistance</h2>
-          <p class="nl-archive-body">A coalition of diaspora organizations convened a rally that began in El Escambron, Puerto Rico and concluded on the steps of J.P. Morgan’s NYC headquarters last week. “Proycto Esencia” has drawn significant opposition from local organizers in Puerto Rico and the diaspora.</p>
-          <div class="nl-archive-tags">
-            <span class="nl-archive-tag">Optional Tag</span>
-          </div>
-          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
-        </article>
-
-        <article class="nl-archive-card reveal">
-          <div class="nl-archive-meta">
-            <span class="nl-archive-date">December 2025</span>
-            <span class="nl-archive-issue">NYC Chapter &middot; Issue #17</span>
-          </div>
-          <h2 class="nl-archive-title">Year-End Recap + 2026 Priorities</h2>
-          <p class="nl-archive-body">A look back at what we accomplished in 2025 — 9 civic education workshops across NYC, an expanded partner network of 26 community orgs, and a new rapid-response volunteer roster — plus our focus areas heading into the new year.</p>
-          <div class="nl-archive-tags">
-            <span class="nl-archive-tag">Recap</span>
-            <span class="nl-archive-tag">Strategy</span>
-          </div>
-          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
-        </article>
-
-        <article class="nl-archive-card reveal">
-          <div class="nl-archive-meta">
-            <span class="nl-archive-date">November 2025</span>
-            <span class="nl-archive-issue">NYC Chapter &middot; Issue #16</span>
-          </div>
-          <h2 class="nl-archive-title">Civic Power: Voter Education Toolkit</h2>
-          <p class="nl-archive-body">We published a bilingual, plain-language toolkit covering registration, rights at the polls, and how to support neighbors with accessibility needs. Host a 30-minute info session, join a phonebank training, or help translate community materials.</p>
-          <div class="nl-archive-tags">
-            <span class="nl-archive-tag">Civic</span>
-            <span class="nl-archive-tag">Education</span>
-          </div>
-          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
-        </article>
-
-        <article class="nl-archive-card reveal">
-          <div class="nl-archive-meta">
-            <span class="nl-archive-date">October 2025</span>
-            <span class="nl-archive-issue">NYC Chapter &middot; Issue #15</span>
-          </div>
-          <h2 class="nl-archive-title">Disaster Readiness + Relief Coordination</h2>
-          <p class="nl-archive-body">Preparedness isn't panic &mdash; it's solidarity. Neighborhood-level checklists, trusted relief partners on the island and in NYC, supply sorting days, and a community briefing on FEMA resources and common pitfalls.</p>
-          <div class="nl-archive-tags">
-            <span class="nl-archive-tag">Relief</span>
-            <span class="nl-archive-tag">Preparedness</span>
-          </div>
-          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
-        </article>
-
-        <article class="nl-archive-card reveal">
-          <div class="nl-archive-meta">
-            <span class="nl-archive-date">September 2025</span>
-            <span class="nl-archive-issue">NYC Chapter &middot; Issue #14</span>
-          </div>
-          <h2 class="nl-archive-title">Meet the Chapter + Fall Events Calendar</h2>
-          <p class="nl-archive-body">We're welcoming new volunteers and launching a monthly "action hour" format &mdash; simple tasks, clear outcomes, real impact. Plus the full fall events calendar: community mixer, Advocacy 101 training, and neighborhood listening sessions.</p>
-          <div class="nl-archive-tags">
-            <span class="nl-archive-tag">Events</span>
-            <span class="nl-archive-tag">Onboarding</span>
-          </div>
-          <a href="#" class="nl-archive-link" style="margin-top: 1rem;">Read full issue &rarr;</a>
-        </article>
-
+      <div class=”nl-archive-grid” id=”nl-archive-grid”>
+        <p style=”grid-column:1/-1;text-align:center;padding:3rem 1rem;font-style:italic;color:#666;”>Loading issues...</p>
       </div>
 
       <div class="divider reveal"></div>
@@ -245,5 +176,28 @@
   </footer>
 
   <script src="main.js"></script>
+  <script>
+    fetch('https://nn3j1n98.api.sanity.io/v2021-10-21/data/query/production?query=*[_type==%22newsletter%22]|order(publishedAt%20desc)')
+      .then(r => r.json())
+      .then(({result}) => {
+        const grid = document.getElementById('nl-archive-grid')
+        if (!result || result.length === 0) {
+          grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:3rem 1rem;font-style:italic;color:#666;">No issues yet — check back soon.</p>`
+          return
+        }
+        grid.innerHTML = result.map((n, i) => `
+          <article class="nl-archive-card${i === 0 ? ' nl-featured' : ''}">
+            <div class="nl-archive-meta">
+              <span class="nl-archive-date">${n.date || ''}</span>
+              ${n.issueNumber ? `<span class="nl-archive-issue">NYC Chapter &middot; Issue #${n.issueNumber}</span>` : ''}
+            </div>
+            <h2 class="nl-archive-title">${n.title || ''}</h2>
+            ${n.body ? `<p class="nl-archive-body">${n.body}</p>` : ''}
+            ${n.tags?.length ? `<div class="nl-archive-tags">${n.tags.map(t => `<span class="nl-archive-tag">${t}</span>`).join('')}</div>` : ''}
+            ${n.link ? `<a href="${n.link}" class="nl-archive-link" style="margin-top:1rem;">Read full issue &rarr;</a>` : ''}
+          </article>
+        `).join('')
+      })
+  </script>
 </body>
 </html>
