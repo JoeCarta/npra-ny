@@ -180,7 +180,7 @@
     fetch('https://nn3j1n98.api.sanity.io/v2021-10-21/data/query/production?query=*[_type==%22newsletter%22]|order(publishedAt%20desc)')
       .then(r => r.json())
       .then(({result}) => {
-        const grid = document.getElementById('nl-archive-grid')
+        const grid = document.getElementById('nl-archive-grid') || document.querySelector('.nl-archive-grid')
         if (!result || result.length === 0) {
           grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:3rem 1rem;font-style:italic;color:#666;">No issues yet — check back soon.</p>`
           return
