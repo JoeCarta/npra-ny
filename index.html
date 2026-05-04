@@ -713,7 +713,7 @@
           return
         }
         grid.innerHTML = result.map(e => `
-          <a href="${e.url || '#'}" class="event reveal" style="text-decoration:none;color:inherit;">
+          <a href="${e.url || '#'}" class="event" style="text-decoration:none;color:inherit;">
             <article style="cursor:pointer;">
               ${e.image?.asset?._ref ? `<div class="event-media"><img style="width:100%;height:auto;" src="${sanityImageUrl(e.image.asset._ref)}" alt="${e.title}" /></div>` : ''}
               <div class="event-body">
