@@ -306,7 +306,7 @@
     // Top nav active state
     const navLinks = Array.from(document.querySelectorAll('.nav a'));
     const targets = navLinks
-      .map(a => document.querySelector(a.getAttribute('href')))
+      .map(a => { try { const h = a.getAttribute('href'); return h?.startsWith('#') ? document.querySelector(h) : null; } catch(e) { return null; } })
       .filter(Boolean);
 
     if ('IntersectionObserver' in window){
