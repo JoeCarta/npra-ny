@@ -200,6 +200,7 @@
     fetch('https://nn3j1n98.api.sanity.io/v2021-10-21/data/query/production?query=*[_type==%22newsletter%22]|order(publishedAt%20desc)')
       .then(r => r.json())
       .then(({result}) => {
+        console.log('[newsletter] result:', result)
         if (!nlGrid) return
         if (!result || result.length === 0) {
           nlGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:3rem 1rem;font-style:italic;color:var(--muted);">No issues yet — check back soon.</p>`
@@ -218,7 +219,8 @@
           </article>
         `).join('')
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('[newsletter] fetch error:', err)
         if (nlGrid) nlGrid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:3rem 1rem;font-style:italic;color:var(--muted);">Unable to load issues — please try again later.</p>`
       })
   </script>
