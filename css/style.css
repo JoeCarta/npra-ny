@@ -239,6 +239,15 @@ a { color: inherit; }
   .nav{ display: flex; }
   .mobile-btn{ display: none; }
 }
+/* Below the nav breakpoint the nav leaves the grid; keep actions pinned right. */
+@media (max-width: 879px){
+  .header-inner{ grid-template-columns: 1fr auto; }
+  .logo, .actions{ min-width: 0; }
+}
+/* Phones: the drawer already carries "Become a Member", so free up room for the menu button. */
+@media (max-width: 559px){
+  .actions .btn-primary{ display: none; }
+}
 
 /* ---------------------------------------------------------------
    Sections
