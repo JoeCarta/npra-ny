@@ -1,0 +1,7 @@
+# Not part of the public website
+studio/
+.claude/
+serve.json
+PRODUCT.md
+todo.md
+font-options.html

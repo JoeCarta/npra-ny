@@ -5,7 +5,8 @@
   "use strict";
 
   var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var SANITY = "https://nn3j1n98.api.sanity.io/v2021-10-21/data/query/production?query=";
+  // API CDN: fast cached reads that refresh automatically when content is published.
+  var SANITY = "https://nn3j1n98.apicdn.sanity.io/v2025-02-19/data/query/production?query=";
 
   /* ---- Mobile menu (exposed for inline handlers) ------------------ */
   function setMenu(open) {
@@ -112,26 +113,81 @@
     btn.classList.add("selected");
   };
 
-  /* ---- Sanity: image URL helper ----------------------------------- */
-  function sanityImageUrl(ref) {
+  /* ---- Sanity: helpers -------------------------------------------- */
+  function sanityImageUrl(ref, width) {
     if (!ref) return "";
     var m = ref.match(/^image-(.+)-(\d+x\d+)-(\w+)$/);
     if (!m) return "";
-    return "https://cdn.sanity.io/images/nn3j1n98/production/" + m[1] + "-" + m[2] + "." + m[3];
+    return "https://cdn.sanity.io/images/nn3j1n98/production/" + m[1] + "-" + m[2] + "." + m[3] +
+      (width ? "?w=" + width + "&fit=max&auto=format" : "");
   }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function fetchJSON(query) {
-    return fetch(SANITY + encodeURIComponent(query)).then(function (r) { return r.json(); });
+  function fetchJSON(query, params) {
+    var url = SANITY + encodeURIComponent(query);
+    Object.keys(params || {}).forEach(function (k) {
+      url += "&" + encodeURIComponent("$" + k) + "=" + encodeURIComponent(JSON.stringify(params[k]));
+    });
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error("Sanity request failed: " + r.status);
+      return r.json();
+    });
   }
-  function fmtMonthYear(iso) {
+  function fmtDate(iso, withDay) {
     if (!iso) return "";
     try {
-      return new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      var opts = withDay ? { month: "long", day: "numeric", year: "numeric" } : { month: "long", year: "numeric" };
+      return new Date(iso + "T12:00:00").toLocaleDateString("en-US", opts);
     } catch (e) { return iso; }
+  }
+  function safeHref(href) {
+    return /^(https?:|mailto:|tel:)/i.test(href || "") ? href : "";
+  }
+
+  /* ---- Portable Text (rich text from the Studio) → HTML ----------- */
+  function renderSpans(children, markDefs) {
+    var defs = {};
+    (markDefs || []).forEach(function (d) { defs[d._key] = d; });
+    return (children || []).map(function (span) {
+      var out = esc(span.text).replace(/\n/g, "<br>");
+      (span.marks || []).forEach(function (mark) {
+        if (mark === "strong") out = "<strong>" + out + "</strong>";
+        else if (mark === "em") out = "<em>" + out + "</em>";
+        else if (defs[mark] && defs[mark]._type === "link") {
+          var href = safeHref(defs[mark].href);
+          if (!href) return;
+          var external = /^https?:/i.test(href);
+          out = '<a href="' + esc(href) + '"' + (external ? ' target="_blank" rel="noopener"' : "") + ">" + out + "</a>";
+        }
+      });
+      return out;
+    }).join("");
+  }
+  function renderPortableText(blocks) {
+    var html = "";
+    var openList = null;
+    var blockTags = { h2: "h2", h3: "h3", blockquote: "blockquote" };
+    (blocks || []).forEach(function (b) {
+      var listTag = b._type === "block" && b.listItem ? (b.listItem === "number" ? "ol" : "ul") : null;
+      if (openList && openList !== listTag) { html += "</" + openList + ">"; openList = null; }
+      if (listTag && !openList) { html += "<" + listTag + ">"; openList = listTag; }
+
+      if (b._type === "block") {
+        var inner = renderSpans(b.children, b.markDefs);
+        if (listTag) { html += "<li>" + inner + "</li>"; return; }
+        if (!inner.replace(/<br>/g, "").trim()) return; // skip empty paragraphs
+        var tag = blockTags[b.style] || "p";
+        html += "<" + tag + ">" + inner + "</" + tag + ">";
+      } else if (b._type === "image" && b.asset && b.asset._ref) {
+        html += '<figure><img loading="lazy" src="' + sanityImageUrl(b.asset._ref, 1400) + '" alt="' + esc(b.alt) + '">' +
+          (b.caption ? "<figcaption>" + esc(b.caption) + "</figcaption>" : "") + "</figure>";
+      }
+    });
+    if (openList) html += "</" + openList + ">";
+    return html;
   }
 
   /* ---- Homepage: events grid (Sanity) ----------------------------- */
@@ -168,22 +224,37 @@
   }
 
   /* ---- Newsletter archive + homepage recent issues (Sanity) ------- */
+  var ISSUE_CARD_FIELDS = '{_id, title, "slug": slug.current, issueNumber, publishedAt, summary, tags, link, ' +
+    '"hasArticle": count(article) > 0, "pdfUrl": pdf.asset->url}';
+
+  // Where "Read" goes: the full article on our site, else the PDF, else an outside link.
+  function issueLink(n) {
+    if (n.hasArticle && n.slug) return '<a href="issue.html?i=' + encodeURIComponent(n.slug) + '" class="nl-archive-link">Read the full issue &rarr;</a>';
+    if (n.pdfUrl) return '<a href="' + esc(n.pdfUrl) + '" class="nl-archive-link" target="_blank" rel="noopener">Read the PDF &rarr;</a>';
+    if (safeHref(n.link)) return '<a href="' + esc(n.link) + '" class="nl-archive-link" target="_blank" rel="noopener">Read full issue &rarr;</a>';
+    return "";
+  }
+  function renderTags(tags) {
+    return tags && tags.length
+      ? '<div class="nl-archive-tags">' + tags.map(function (t) { return '<span class="nl-archive-tag">' + esc(t) + "</span>"; }).join("") + "</div>"
+      : "";
+  }
   function renderIssue(n, featured) {
     return '<article class="nl-archive-card' + (featured ? " nl-featured" : "") + '">' +
       '<div class="nl-archive-meta">' +
-        '<span class="nl-archive-date">' + esc(fmtMonthYear(n.publishedAt)) + "</span>" +
+        '<span class="nl-archive-date">' + esc(fmtDate(n.publishedAt)) + "</span>" +
         (n.issueNumber ? '<span class="nl-archive-issue">NYC Chapter · Issue #' + esc(n.issueNumber) + "</span>" : "") +
       "</div>" +
       '<h2 class="nl-archive-title">' + esc(n.title) + "</h2>" +
-      (n.body ? '<p class="nl-archive-body">' + esc(n.body) + "</p>" : "") +
-      (n.tags && n.tags.length ? '<div class="nl-archive-tags">' + n.tags.map(function (t) { return '<span class="nl-archive-tag">' + esc(t) + "</span>"; }).join("") + "</div>" : "") +
-      (n.link ? '<a href="' + esc(n.link) + '" class="nl-archive-link" target="_blank" rel="noopener">Read full issue &rarr;</a>' : "") +
+      (n.summary ? '<p class="nl-archive-body">' + esc(n.summary) + "</p>" : "") +
+      renderTags(n.tags) +
+      issueLink(n) +
       "</article>";
   }
 
   var nlGrid = document.getElementById("nl-archive-grid");
   if (nlGrid) {
-    fetchJSON('*[_type=="newsletter"]|order(publishedAt desc)')
+    fetchJSON('*[_type=="newsletter"]|order(publishedAt desc)' + ISSUE_CARD_FIELDS)
       .then(function (data) {
         var result = data.result;
         if (!result || !result.length) {
@@ -197,7 +268,7 @@
 
   var nlRecent = document.getElementById("nl-recent");
   if (nlRecent) {
-    fetchJSON('*[_type=="newsletter"]|order(publishedAt desc)[0...3]')
+    fetchJSON('*[_type=="newsletter"]|order(publishedAt desc)[0...3]' + ISSUE_CARD_FIELDS)
       .then(function (data) {
         var result = data.result;
         // Keep the static featured card if there's nothing to show.
@@ -205,5 +276,64 @@
         nlRecent.innerHTML = result.map(function (n, i) { return renderIssue(n, i === 0); }).join("");
       })
       .catch(function () {});
+  }
+
+  /* ---- Single issue page (issue.html?i=<page link>) --------------- */
+  var issueHeader = document.getElementById("issue-header");
+  var issueBody = document.getElementById("issue-body");
+  if (issueHeader && issueBody) {
+    var eyebrow = '<div class="eyebrow"><a href="newsletter.html" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>';
+    var backLink = '<a href="newsletter.html" class="nl-archive-link issue-back">&larr; All issues</a>';
+    var showMissing = function (heading, msg) {
+      issueHeader.removeAttribute("aria-busy");
+      issueHeader.innerHTML = eyebrow + '<h1 class="page-title issue-title">' + heading + "</h1>";
+      issueBody.innerHTML = '<p class="lead">' + msg + "</p>" + '<div class="issue-actions">' + backLink + "</div>";
+    };
+    var slug = new URLSearchParams(window.location.search).get("i");
+    if (!slug) {
+      showMissing("Issue not found", "This link is missing the issue it points to.");
+    } else {
+      fetchJSON(
+        '*[_type=="newsletter" && slug.current==$slug][0]{title, issueNumber, publishedAt, author, summary, tags, link, ' +
+        'coverImage{alt, asset}, article, "pdfUrl": pdf.asset->url}',
+        { slug: slug }
+      )
+        .then(function (data) {
+          var n = data.result;
+          if (!n) {
+            showMissing("Issue not found", "We couldn’t find that issue. It may not be published yet, or its link may have changed.");
+            return;
+          }
+          document.title = n.title + " — La Agenda-NY";
+          var metaDesc = document.querySelector('meta[name="description"]');
+          if (metaDesc && n.summary) metaDesc.setAttribute("content", n.summary);
+
+          var meta = [
+            n.publishedAt ? '<span class="issue-date">' + esc(fmtDate(n.publishedAt, true)) + "</span>" : "",
+            n.issueNumber ? "<span>Issue #" + esc(n.issueNumber) + "</span>" : "",
+            n.author ? "<span>By " + esc(n.author) + "</span>" : ""
+          ].join("");
+          issueHeader.removeAttribute("aria-busy");
+          issueHeader.innerHTML = eyebrow +
+            '<h1 class="page-title issue-title">' + esc(n.title) + "</h1>" +
+            (meta ? '<p class="issue-meta">' + meta + "</p>" : "") +
+            (n.summary ? '<p class="lead">' + esc(n.summary) + "</p>" : "");
+
+          var cover = n.coverImage && n.coverImage.asset && n.coverImage.asset._ref
+            ? '<figure class="issue-cover"><img src="' + sanityImageUrl(n.coverImage.asset._ref, 1600) + '" alt="' + esc(n.coverImage.alt) + '"></figure>'
+            : "";
+          var actions = [
+            n.pdfUrl ? '<a href="' + esc(n.pdfUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">Read the PDF</a>' : "",
+            safeHref(n.link) ? '<a href="' + esc(n.link) + '" class="btn" target="_blank" rel="noopener">View this issue online</a>' : ""
+          ].join("");
+          issueBody.innerHTML = cover +
+            '<div class="prose">' + renderPortableText(n.article) + "</div>" +
+            (actions ? '<div class="issue-buttons">' + actions + "</div>" : "") +
+            '<div class="issue-actions">' + renderTags(n.tags) + backLink + "</div>";
+        })
+        .catch(function () {
+          showMissing("Couldn’t load this issue", "This issue couldn’t load right now. Please try again in a moment.");
+        });
+    }
   }
 })();
