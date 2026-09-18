@@ -1,9 +1,30 @@
-# Sanity Clean Content Studio
+# NPRA-NY Content Studio
 
-Congratulations, you have now installed the Sanity Content Studio, an open-source real-time content editing environment connected to the Sanity backend.
+Sanity Studio for nprany.org. Writers use the hosted version at
+**https://nprany.sanity.studio**; nothing here needs to run for them to publish.
 
-Now you can do the following things:
+- Project `nn3j1n98`, dataset `production` (public read)
+- The website reads published content straight from Sanity in the browser
+  (`js/main.js`), so publishing in the Studio updates the live site within
+  about a minute, with no site redeploy needed.
 
-- [Read “getting started” in the docs](https://www.sanity.io/docs/introduction/getting-started?utm_source=readme)
-- [Join the Sanity community](https://www.sanity.io/community/join?utm_source=readme)
-- [Extend and build plugins](https://www.sanity.io/docs/content-studio/extending?utm_source=readme)
+## What's editable
+
+| Studio section | Where it shows up |
+| --- | --- |
+| La Agenda (newsletter) | `newsletter.html` archive, homepage "Recent Issues", and `issue.html?i=<page link>` for issues with a full article |
+| Event | Homepage "Upcoming Events" |
+| Site Settings | Homepage board intro text (`subtext`) |
+
+## Developing
+
+```bash
+npm install
+npm run dev      # local Studio at http://localhost:3333
+npm run deploy   # build + deploy to nprany.sanity.studio (also deploys the schema)
+```
+
+The hosted Studio auto-updates Sanity itself, so keep the local `sanity`
+version in line with what `sanity build` reports as the runtime version.
+
+Schema lives in `schemaTypes/`; the sidebar layout is in `structure.js`.
