@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Local tooling (not part of the site)
+skills/
+.claude/settings.local.json
+.vercel/
+
+# Env files
+.env
+.env.*
+
+# OS junk
+.DS_Store
+desktop.ini
+Thumbs.db
