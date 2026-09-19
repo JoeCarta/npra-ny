@@ -174,7 +174,7 @@
     if (!hasFlyer(e)) return "";
     return '<img class="' + cls + '" loading="lazy" src="' + sanityImageUrl(e.image.asset._ref, width) + '" alt="' + esc(alt) + '">';
   }
-  function calendarLink(day) { return "members.html?day=" + day + "#events"; }
+  function calendarLink(day) { return "/members?day=" + day + "#events"; }
 
   var eventsPromise = null;
   function loadEvents() {

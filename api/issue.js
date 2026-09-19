@@ -27,7 +27,7 @@ function missingPage(req, heading, message) {
     <section class="page-header" id="top">
       <div class="container">
         <div class="page-header-content">
-          <div class="eyebrow"><a href="/newsletter.html" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>
+          <div class="eyebrow"><a href="/newsletter" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>
           <h1 class="page-title issue-title">${esc(heading)}</h1>
         </div>
       </div>
@@ -36,7 +36,7 @@ function missingPage(req, heading, message) {
       <div class="container">
         <div class="issue-body">
           <p class="lead">${esc(message)}</p>
-          <div class="issue-actions"><a href="/newsletter.html" class="nl-archive-link issue-back">&larr; All issues</a></div>
+          <div class="issue-actions"><a href="/newsletter" class="nl-archive-link issue-back">&larr; All issues</a></div>
         </div>
       </div>
     </section>
@@ -126,7 +126,7 @@ module.exports = async function handler(req, res) {
       <header class="page-header" id="top">
         <div class="container">
           <div class="page-header-content">
-            <div class="eyebrow"><a href="/newsletter.html" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>
+            <div class="eyebrow"><a href="/newsletter" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>
             <h1 class="page-title issue-title">${esc(issue.title)}</h1>
             ${meta ? `<p class="issue-meta">${meta}</p>` : ""}
             ${issue.summary ? `<p class="lead">${esc(issue.summary)}</p>` : ""}
@@ -137,7 +137,7 @@ module.exports = async function handler(req, res) {
         <div class="container">
           <div class="issue-body">
             ${cover}<div class="prose">${renderPortableText(issue.article)}</div>${buttons ? `<div class="issue-buttons">${buttons}</div>` : ""}
-            <div class="issue-actions">${tagList}<a href="/newsletter.html" class="nl-archive-link issue-back">&larr; All issues</a></div>
+            <div class="issue-actions">${tagList}<a href="/newsletter" class="nl-archive-link issue-back">&larr; All issues</a></div>
           </div>
         </div>
       </div>

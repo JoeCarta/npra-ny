@@ -1,4 +1,4 @@
-// Server-rendered homepage: / and /index.html  (see vercel.json)
+// Server-rendered homepage: /  (see vercel.json)
 // templates/home.html is the page; each <!--cms:key-->…<!--/cms:key--> region is
 // filled from the Studio's "Home page" document. A region with no content in
 // Sanity keeps the template's text, and if Sanity can't be reached the template
@@ -26,7 +26,7 @@ async function template(req) {
   } catch (err) {
     const host = (req.headers && req.headers.host) || new URL(SITE_URL).host;
     const proto = /^(localhost|127\.)/.test(host) ? "http" : "https";
-    templateCache = await (await fetch(`${proto}://${host}/templates/home.html`)).text();
+    templateCache = await (await fetch(`${proto}://${host}/templates/home`)).text();
   }
   return templateCache;
 }
@@ -74,7 +74,7 @@ function boardCard(m, index) {
               <div class="tc-bio-name">Open Position</div>
               <div class="tc-bio-role">${esc(m.role)}</div>
               ${bio}
-              <a href="join.html" class="btn btn-primary" style="margin-top: 1.1rem;">Get Involved</a>
+              <a href="/join" class="btn btn-primary" style="margin-top: 1.1rem;">Get Involved</a>
             </div>
           </div>
         </div>`;

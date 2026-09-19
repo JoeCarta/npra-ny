@@ -2,7 +2,7 @@
 // so search engines find new issues as soon as they're published.
 const { SITE_URL, sanityQuery, esc, send } = require("./_lib/site");
 
-const STATIC_PAGES = ["/", "/newsletter.html", "/members.html", "/join.html"];
+const STATIC_PAGES = ["/", "/newsletter", "/members", "/join"];
 
 module.exports = async function handler(req, res) {
   let issues = [];

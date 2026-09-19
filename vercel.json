@@ -1,17 +1,20 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "functions": {
     "api/home.js": { "includeFiles": "templates/home.html" },
     "api/issue.js": { "includeFiles": "newsletter.html" }
   },
   "rewrites": [
     { "source": "/", "destination": "/api/home" },
-    { "source": "/index.html", "destination": "/api/home" },
     { "source": "/la-agenda/:slug", "destination": "/api/issue?slug=:slug" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ],
   "redirects": [
-    { "source": "/la-agenda", "destination": "/newsletter.html", "permanent": false },
+    { "source": "/index", "destination": "/", "permanent": true },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/la-agenda", "destination": "/newsletter", "permanent": false },
     {
       "source": "/issue.html",
       "has": [{ "type": "query", "key": "i", "value": "(?<slug>[a-z0-9-]+)" }],

@@ -15,8 +15,8 @@ Sanity Studio for nprany.org. Writers use the hosted version at
 | Studio section | Where it shows up |
 | --- | --- |
 | Home page | All the homepage's text (hero, Our Story, Mission, Focus Areas, Board, section headings, membership). `api/home.js` fills the marked regions of `templates/home.html`; anything empty keeps the template's text |
-| La Agenda (newsletter) | `newsletter.html` archive, homepage "Recent Issues", and each issue's own page at `/la-agenda/<page link>`, server-rendered by `api/issue.js` so the full text is searchable (also listed in `/sitemap.xml`) |
-| Calendar (events & flyers) | Upcoming list on `members.html#events`, next three events on the homepage, and the full-screen monthly calendar both pages open with "Open monthly calendar" (per-day flyer view, shareable `?day=YYYY-MM-DD` links) |
+| La Agenda (newsletter) | `/newsletter` archive, homepage "Recent Issues", and each issue's own page at `/la-agenda/<page link>`, server-rendered by `api/issue.js` so the full text is searchable (also listed in `/sitemap.xml`) |
+| Calendar (events & flyers) | Upcoming list on `/members#events`, next three events on the homepage, and the full-screen monthly calendar both pages open with "Open monthly calendar" (per-day flyer view, shareable `?day=YYYY-MM-DD` links) |
 | Site Settings | Retired (replaced by Home page); hidden from the sidebar |
 
 ## Developing

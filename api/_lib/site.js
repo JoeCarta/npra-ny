@@ -107,7 +107,7 @@ async function siteShell(req) {
     // Fallback if the file wasn't bundled with the function: fetch it from the site.
     const host = (req && req.headers && req.headers.host) || new URL(SITE_URL).host;
     const proto = /^(localhost|127\.)/.test(host) ? "http" : "https";
-    html = await (await fetch(`${proto}://${host}/newsletter.html`)).text();
+    html = await (await fetch(`${proto}://${host}/newsletter`)).text();
   }
   html = html.replace(/(\s(?:href|src))="(?!https?:|\/|#|mailto:|tel:|data:)([^"]*)"/g, '$1="/$2"');
 
