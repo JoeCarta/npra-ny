@@ -18,11 +18,20 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    // Only one Home page exists; don't offer "create new" for it (or the retired Site Settings).
+    templates: (templates) =>
+      templates.filter(({schemaType}) => !['homePage', 'siteSettings'].includes(schemaType)),
   },
 
   document: {
-    // Adds "Open preview" to the document menu, linking to the live issue page.
+    // The Home page can be edited and published, but not deleted, unpublished or duplicated.
+    actions: (prev, {schemaType}) =>
+      schemaType === 'homePage'
+        ? prev.filter(({action}) => !['delete', 'unpublish', 'duplicate'].includes(action))
+        : prev,
+    // Adds "Open preview" to the document menu, linking to the live page.
     productionUrl: async (prev, {document}) => {
+      if (document._type === 'homePage') return `${SITE_URL}/`
       if (document._type === 'newsletter' && document.slug?.current) {
         return `${SITE_URL}/la-agenda/${encodeURIComponent(document.slug.current)}`
       }

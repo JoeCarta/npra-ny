@@ -4,17 +4,20 @@ Sanity Studio for nprany.org. Writers use the hosted version at
 **https://nprany.sanity.studio**; nothing here needs to run for them to publish.
 
 - Project `nn3j1n98`, dataset `production` (public read)
-- The website reads published content straight from Sanity in the browser
-  (`js/main.js`), so publishing in the Studio updates the live site within
-  about a minute, with no site redeploy needed.
+- The website reads published content straight from Sanity: the homepage and
+  La Agenda issue pages are rendered by Vercel functions (`api/`, cached ~30s),
+  and lists like events and recent issues load in the browser (`js/main.js`).
+  Publishing in the Studio updates the live site within about 30 seconds,
+  with no site redeploy needed.
 
 ## What's editable
 
 | Studio section | Where it shows up |
 | --- | --- |
+| Home page | All the homepage's text (hero, Our Story, Mission, Focus Areas, Board, section headings, membership). `api/home.js` fills the marked regions of `templates/home.html`; anything empty keeps the template's text |
 | La Agenda (newsletter) | `newsletter.html` archive, homepage "Recent Issues", and each issue's own page at `/la-agenda/<page link>`, server-rendered by `api/issue.js` so the full text is searchable (also listed in `/sitemap.xml`) |
 | Calendar (events & flyers) | Upcoming list on `members.html#events`, next three events on the homepage, and the full-screen monthly calendar both pages open with "Open monthly calendar" (per-day flyer view, shareable `?day=YYYY-MM-DD` links) |
-| Site Settings | Homepage board intro text (`subtext`) |
+| Site Settings | Retired (replaced by Home page); hidden from the sidebar |
 
 ## Developing
 

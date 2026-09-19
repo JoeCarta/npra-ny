@@ -1,6 +1,9 @@
 import {event} from './event'
+import {homePage} from './homePage'
 import {newsletter} from './newsletter'
 
+// Superseded by the Home page document; kept so the old document stays valid.
+// Hidden from the Studio sidebar (see structure.js).
 const siteSettings = {
   name: 'siteSettings',
   title: 'Site Settings',
@@ -21,4 +24,4 @@ const siteSettings = {
   ],
 }
 
-export const schemaTypes = [newsletter, event, siteSettings]
+export const schemaTypes = [homePage, newsletter, event, siteSettings]

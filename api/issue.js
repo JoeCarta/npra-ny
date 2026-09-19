@@ -2,13 +2,10 @@
 // The full text is in the HTML Google receives, with title, description,
 // canonical URL, social previews and NewsArticle structured data.
 const {
-  SITE_URL, ORG_NAME, sanityQuery, esc, imageUrl, formatDate, safeHref,
+  SITE_URL, ORG_NAME, PAGE_CACHE, sanityQuery, esc, imageUrl, formatDate, safeHref,
   renderPortableText, renderPage, clip, send,
 } = require("./_lib/site");
 
-// Vercel's CDN keeps each page for a minute, then refreshes in the background,
-// so a publish in the Studio shows up within about a minute.
-const CACHE_OK = "public, max-age=0, s-maxage=60, stale-while-revalidate=300";
 const CACHE_MISSING = "public, max-age=0, s-maxage=30";
 
 const ISSUE_QUERY = `*[_type == "newsletter" && slug.current == $slug][0]{
@@ -154,5 +151,5 @@ module.exports = async function handler(req, res) {
     headExtra,
     main,
   });
-  send(res, 200, html, { cache: CACHE_OK });
+  send(res, 200, html, { cache: PAGE_CACHE });
 };

@@ -1,12 +1,19 @@
-import {CalendarIcon, DocumentTextIcon} from '@sanity/icons'
+import {CalendarIcon, DocumentTextIcon, HomeIcon} from '@sanity/icons'
 
-const LISTED = ['newsletter', 'event']
+// Types with their own sidebar entry (or hidden) instead of the generic list.
+const CUSTOM = ['homePage', 'newsletter', 'event', 'siteSettings']
 
-// Sidebar for writers: La Agenda and the calendar first, everything else below.
+// Sidebar for writers: the Home page, La Agenda and the calendar first.
 export const structure = (S) =>
   S.list()
     .title('Content')
     .items([
+      S.listItem()
+        .title('Home page')
+        .id('homePage')
+        .icon(HomeIcon)
+        .child(S.document().schemaType('homePage').documentId('homePage').title('Home page')),
+      S.divider(),
       S.listItem()
         .title('La Agenda (newsletter)')
         .icon(DocumentTextIcon)
@@ -25,6 +32,5 @@ export const structure = (S) =>
             .title('Events & flyers')
             .defaultOrdering([{field: 'startDate', direction: 'desc'}]),
         ),
-      S.divider(),
-      ...S.documentTypeListItems().filter((item) => !LISTED.includes(item.getId())),
+      ...S.documentTypeListItems().filter((item) => !CUSTOM.includes(item.getId())),
     ])

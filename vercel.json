@@ -1,9 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
+    "api/home.js": { "includeFiles": "templates/home.html" },
     "api/issue.js": { "includeFiles": "newsletter.html" }
   },
   "rewrites": [
+    { "source": "/", "destination": "/api/home" },
+    { "source": "/index.html", "destination": "/api/home" },
     { "source": "/la-agenda/:slug", "destination": "/api/issue?slug=:slug" },
     { "source": "/sitemap.xml", "destination": "/api/sitemap" }
   ],

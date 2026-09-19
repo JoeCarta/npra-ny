@@ -7,8 +7,12 @@ const SITE_URL = (process.env.SITE_URL || "https://www.nprany.org").replace(/\/$
 const ORG_NAME = "National Puerto Rican Agenda, New York Chapter";
 const SANITY_PROJECT = "nn3j1n98";
 const SANITY_DATASET = "production";
-// API CDN: cached reads that refresh when content is published in the Studio.
-const SANITY_API = `https://${SANITY_PROJECT}.apicdn.sanity.io/v2025-02-19/data/query/${SANITY_DATASET}`;
+// The live (uncached) API: Vercel's CDN already caches each page, so going
+// through Sanity's API CDN as well would only add delay after a publish.
+const SANITY_API = `https://${SANITY_PROJECT}.api.sanity.io/v2025-02-19/data/query/${SANITY_DATASET}`;
+// How long Vercel's CDN keeps a rendered page before re-rendering it:
+// edits published in the Studio show up within about 30 seconds.
+const PAGE_CACHE = "public, max-age=0, s-maxage=30, stale-while-revalidate=30";
 
 async function sanityQuery(query, params) {
   const url = new URL(SANITY_API);
@@ -143,6 +147,6 @@ function send(res, status, body, { type = "text/html; charset=utf-8", cache } = 
 }
 
 module.exports = {
-  SITE_URL, ORG_NAME, sanityQuery, esc, imageUrl, formatDate, safeHref,
+  SITE_URL, ORG_NAME, PAGE_CACHE, sanityQuery, esc, imageUrl, formatDate, safeHref,
   renderPortableText, renderPage, clip, send,
 };

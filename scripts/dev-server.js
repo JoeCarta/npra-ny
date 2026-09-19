@@ -36,6 +36,7 @@ http.createServer(async (req, res) => {
       return redirect(res, "/la-agenda/" + url.searchParams.get("i"), 308);
     }
     // --- mirrors vercel.json "rewrites" ---
+    if (p === "/" || p === "/index.html") return await api("home.js")(req, res);
     const issue = p.match(/^\/la-agenda\/([^/]+)$/);
     if (issue) {
       req.url = "/api/issue?slug=" + issue[1];

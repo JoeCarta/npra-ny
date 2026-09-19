@@ -510,14 +510,6 @@
       });
   }
 
-  /* ---- Homepage: team subtext (Sanity siteSettings) --------------- */
-  var teamSubtext = document.getElementById("team-subtext");
-  if (teamSubtext) {
-    fetchJSON('*[_type=="siteSettings"][0]')
-      .then(function (data) { if (data.result && data.result.subtext) teamSubtext.textContent = data.result.subtext; })
-      .catch(function () {});
-  }
-
   /* ---- Newsletter archive + homepage recent issues (Sanity) ------- */
   var ISSUE_CARD_FIELDS = '{_id, title, "slug": slug.current, issueNumber, publishedAt, summary, tags, link}';
 
