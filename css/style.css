@@ -462,8 +462,9 @@ section{ scroll-margin-top: 92px; }
   transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 .event:hover{ border-color: var(--line-2); box-shadow: var(--shadow-md); transform: translateY(-3px); }
-.event-media{ aspect-ratio: 3/2; overflow: hidden; background: var(--paper-3); }
-.event-media img{ width: 100%; height: 100%; object-fit: cover; }
+/* Flyers: show the whole thing (text is the point), letterboxed on paper. */
+.event-media{ aspect-ratio: 4/5; overflow: hidden; background: var(--paper-3); }
+.event-media img{ width: 100%; height: 100%; object-fit: contain; }
 .event-body{ padding: 1.25rem 1.3rem 1.4rem; }
 .event h3{ font-family: var(--font-serif); font-weight: 700; font-size: 1.2rem; line-height: 1.25; margin-bottom: 0.6rem; }
 .meta{ display: flex; gap: 0.5rem; align-items: center; color: var(--ink-3); font-size: 0.9rem; margin-top: 0.35rem; }
@@ -651,6 +652,108 @@ section{ scroll-margin-top: 92px; }
 .event-row-meta{ font-size: 0.85rem; color: var(--ink-3); }
 .event-row-type{ font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; padding: 0.35em 0.85em; border-radius: 999px; background: var(--oxblood-wash); color: var(--oxblood-ink); border: 1px solid var(--oxblood-line); flex: none; white-space: nowrap; }
 @media (max-width: 560px){ .event-row{ gap: 0.9rem; padding: 1rem; } .event-row-type{ display: none; } }
+
+/* ---------------------------------------------------------------
+   Events calendar (members.html#events, filled by js/main.js)
+   --------------------------------------------------------------- */
+.cal{
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  background: var(--paper); box-shadow: var(--shadow-sm);
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+.cal-head{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.cal-month{ font-family: var(--font-serif); font-weight: 700; font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.15; color: var(--ink); }
+.cal-nav{ display: flex; align-items: center; gap: 0.5rem; }
+.cal-today{ min-height: 44px; }
+.cal-arrow, .cal-close{
+  display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none;
+  border-radius: var(--radius-sm); border: 1px solid var(--line-2);
+  background: var(--paper); color: var(--ink); cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.cal-arrow:hover, .cal-close:hover{ background: var(--paper-2); border-color: var(--ink-3); }
+.cal-arrow svg, .cal-close svg{ width: 20px; height: 20px; }
+
+.cal-grid{ width: 100%; border-collapse: collapse; table-layout: fixed; }
+.cal-grid th{
+  padding: 0 0.5rem 0.6rem; text-align: left;
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3);
+}
+.cal-grid abbr{ text-decoration: none; }
+.cal-grid td{ height: 122px; vertical-align: top; border: 1px solid var(--line); padding: 0.35rem; }
+.cal-out{ background: var(--paper-2); }
+.cal-date{
+  display: inline-grid; place-items: center; min-width: 2rem; height: 2rem; padding: 0 0.35rem;
+  border: 0; border-radius: 999px; background: none;
+  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600; color: var(--ink-2);
+}
+button.cal-date{ cursor: pointer; color: var(--ink); }
+.is-past .cal-date{ color: var(--ink-3); font-weight: 500; }
+.is-today .cal-date{ background: var(--oxblood); color: oklch(0.99 0.005 60); }
+.cal-day.has-events{ cursor: pointer; transition: background 160ms ease; }
+.cal-day.has-events:hover{ background: var(--paper-2); }
+
+.cal-chips{ display: grid; gap: 0.3rem; margin-top: 0.25rem; }
+.cal-chip{
+  display: flex; align-items: center; gap: 0.4rem; padding: 0.25rem;
+  border: 1px solid var(--line); border-radius: 6px; background: var(--paper-2);
+  font-size: 0.76rem; font-weight: 600; line-height: 1.25; color: var(--ink);
+}
+.cal-day.has-events:hover .cal-chip{ border-color: var(--oxblood-line); background: var(--paper); }
+.cal-chip img{ width: 26px; height: 32px; object-fit: cover; border-radius: 3px; flex: none; }
+.cal-chip span{ display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-width: 0; }
+.is-past .cal-chip{ opacity: 0.7; }
+.cal-dots{ display: none; }
+
+.cal-list-title{ font-family: var(--font-serif); font-weight: 700; font-size: 1.15rem; color: var(--ink); margin: 2rem 0 0.9rem; }
+.cal .events-list{ box-shadow: none; }
+.cal-row{ width: 100%; text-align: left; font: inherit; color: inherit; background: var(--paper); border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.cal-row .event-row-title, .cal-row .event-row-meta{ display: block; }
+.cal-row.is-past{ opacity: 0.72; }
+.cal-row-thumb{ width: 48px; height: 60px; flex: none; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); }
+
+/* Phones: dots instead of flyer chips; the list below carries the detail. */
+@media (max-width: 699px){
+  .cal-grid th{ padding: 0 0 0.5rem; text-align: center; }
+  .cal-grid td{ height: 58px; padding: 0.2rem 0; text-align: center; }
+  .cal-date{ min-width: 1.9rem; height: 1.9rem; font-size: 0.85rem; }
+  .has-events .cal-date{ color: var(--oxblood-ink); font-weight: 700; }
+  .is-today .cal-date{ color: oklch(0.99 0.005 60); }
+  .cal-chips{ display: none; }
+  .cal-dots{ display: flex; justify-content: center; gap: 3px; margin-top: 3px; }
+  .cal-dots i{ width: 6px; height: 6px; border-radius: 50%; background: var(--oxblood); }
+}
+
+/* Day popup with the full flyer(s) */
+.cal-dialog{
+  width: min(780px, calc(100vw - 2rem)); max-width: none; max-height: calc(100dvh - 2rem);
+  margin: auto; padding: 0; border: 0; background: transparent; color: var(--ink); overflow: visible;
+}
+.cal-dialog::backdrop{ background: oklch(0.22 0.02 40 / 0.55); }
+html:has(.cal-dialog[open]){ overflow: hidden; }
+.cal-dialog-inner{
+  max-height: calc(100dvh - 2rem); overflow: auto; overscroll-behavior: contain;
+  background: var(--paper); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+}
+.cal-dialog-head{
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.85rem 1rem 0.85rem 1.25rem; background: var(--paper); border-bottom: 1px solid var(--line);
+}
+.cal-dialog-title{ font-family: var(--font-serif); font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+.cal-dialog-body{ display: grid; gap: 1.75rem; padding: 1.25rem; }
+.cal-flyer{ display: grid; gap: 1.25rem; }
+.cal-flyer + .cal-flyer{ padding-top: 1.75rem; border-top: 1px solid var(--line); }
+.cal-flyer-img{
+  width: 100%; max-height: 72vh; object-fit: contain;
+  background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-md);
+}
+.cal-flyer-title{ font-family: var(--font-serif); font-size: 1.35rem; font-weight: 700; line-height: 1.25; margin-bottom: 0.5rem; text-wrap: balance; }
+.cal-flyer-desc{ margin-top: 0.9rem; color: var(--ink-2); line-height: 1.65; }
+.cal-flyer-buttons{ display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.25rem; }
+@media (min-width: 700px){
+  .cal-flyer{ grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
+}
 
 /* Members — bulletin board */
 .bulletin-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2rem; }

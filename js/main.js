@@ -190,29 +190,251 @@
     return html;
   }
 
-  /* ---- Homepage: events grid (Sanity) ----------------------------- */
+  /* ---- Events: shared data + date helpers (Sanity) ---------------- */
+  var calIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>';
+  var clockIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+  var pinIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>';
+  var LONG_DATE = { month: "long", day: "numeric", year: "numeric" };
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dayKey(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseDay(key) { var p = key.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function fmtDay(key, opts) { return parseDay(key).toLocaleDateString("en-US", opts); }
+  function fmtRange(start, end) {
+    if (!end || end === start) return fmtDay(start, LONG_DATE);
+    try { return new Intl.DateTimeFormat("en-US", LONG_DATE).formatRange(parseDay(start), parseDay(end)); }
+    catch (err) { return fmtDay(start, LONG_DATE) + " – " + fmtDay(end, LONG_DATE); }
+  }
+  // Every calendar day an event is on: its date range plus any "also happening on" dates.
+  function eventDays(e) {
+    var days = [];
+    var last = e.endDate && e.endDate > e.startDate ? e.endDate : e.startDate;
+    for (var d = parseDay(e.startDate); dayKey(d) <= last && days.length < 92; d.setDate(d.getDate() + 1)) days.push(dayKey(d));
+    (e.moreDates || []).forEach(function (k) { if (k && days.indexOf(k) < 0) days.push(k); });
+    return days.sort();
+  }
+  function hasFlyer(e) { return !!(e.image && e.image.asset && e.image.asset._ref); }
+  function flyerImg(e, width, cls, alt) {
+    if (!hasFlyer(e)) return "";
+    return '<img class="' + cls + '" loading="lazy" src="' + sanityImageUrl(e.image.asset._ref, width) + '" alt="' + esc(alt) + '">';
+  }
+  function calendarLink(day) { return "members.html?day=" + day + "#events"; }
+
+  var eventsPromise = null;
+  function loadEvents() {
+    if (!eventsPromise) {
+      eventsPromise = fetchJSON('*[_type=="event" && defined(startDate)]|order(startDate asc)[0...500]' +
+        '{_id, title, startDate, endDate, moreDates, time, location, description, url, image{alt, asset}}')
+        .then(function (data) {
+          return (data.result || []).map(function (e) { e.days = eventDays(e); return e; });
+        });
+    }
+    return eventsPromise;
+  }
+
+  /* ---- Homepage: next three upcoming events ----------------------- */
   var eventsGrid = document.getElementById("events-grid");
   if (eventsGrid) {
-    var calIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25"/></svg>';
-    var pinIcon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>';
-    fetchJSON('*[_type=="event"]|order(date)')
-      .then(function (data) {
-        var result = data.result;
-        if (!result || !result.length) {
+    loadEvents()
+      .then(function (events) {
+        var today = dayKey(new Date());
+        var upcoming = events
+          .map(function (e) { return { e: e, next: e.days.filter(function (k) { return k >= today; })[0] }; })
+          .filter(function (x) { return x.next; })
+          .sort(function (a, b) { return a.next < b.next ? -1 : a.next > b.next ? 1 : 0; })
+          .slice(0, 3);
+        if (!upcoming.length) {
           eventsGrid.innerHTML = '<p class="events-empty">Stay tuned for upcoming events.</p>';
           return;
         }
-        eventsGrid.innerHTML = result.map(function (e) {
-          var img = e.image && e.image.asset && e.image.asset._ref
-            ? '<div class="event-media"><img loading="lazy" src="' + sanityImageUrl(e.image.asset._ref) + '" alt="' + esc(e.title) + '"></div>' : "";
-          return '<a href="' + esc(e.url || "#") + '" class="event">' + img +
+        eventsGrid.innerHTML = upcoming.map(function (x) {
+          var e = x.e;
+          // Multi-day events show their whole range; repeating ones show the next date.
+          var when = e.endDate && x.next <= e.endDate ? fmtRange(e.startDate, e.endDate) : fmtDay(x.next, LONG_DATE);
+          return '<a href="' + calendarLink(x.next) + '" class="event">' +
+            (hasFlyer(e) ? '<div class="event-media">' + flyerImg(e, 800, "", "") + "</div>" : "") +
             '<div class="event-body"><h3>' + esc(e.title) + "</h3>" +
-            (e.date ? '<div class="meta">' + calIcon + "<span>" + esc(e.date) + "</span></div>" : "") +
+            '<div class="meta">' + calIcon + "<span>" + esc(when) + "</span></div>" +
+            (e.time ? '<div class="meta">' + clockIcon + "<span>" + esc(e.time) + "</span></div>" : "") +
             (e.location ? '<div class="meta">' + pinIcon + "<span>" + esc(e.location) + "</span></div>" : "") +
             "</div></a>";
         }).join("");
       })
       .catch(function () { eventsGrid.innerHTML = '<p class="events-empty">Events are unavailable right now — please check back soon.</p>'; });
+  }
+
+  /* ---- Members page: monthly calendar with flyers ----------------- */
+  var cal = document.getElementById("event-calendar");
+  var calDialog = document.getElementById("cal-dialog");
+  if (cal && calDialog) {
+    var calBody = document.getElementById("cal-body");
+    var calMonth = document.getElementById("cal-month");
+    var calList = document.getElementById("cal-list");
+    var calListTitle = document.getElementById("cal-list-title");
+    var dialogTitle = document.getElementById("cal-dialog-title");
+    var dialogBody = document.getElementById("cal-dialog-body");
+    var byDay = {};
+    var allEvents = [];
+    var lastTrigger = null;
+    var calState = "loading"; // loading | ready | error
+    var view = new Date();
+    view.setDate(1);
+
+    var linkedDay = new URLSearchParams(window.location.search).get("day");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(linkedDay || "")) linkedDay = null;
+    if (linkedDay) view = parseDay(linkedDay.slice(0, 8) + "01");
+
+    var renderMonth = function () {
+      var y = view.getFullYear(), m = view.getMonth();
+      var prefix = y + "-" + pad(m + 1);
+      var today = dayKey(new Date());
+      var monthName = view.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      calMonth.textContent = monthName;
+
+      // Grid: blank cells before the 1st, one cell per day, blanks to finish the last week.
+      var offset = view.getDay();
+      var daysInMonth = new Date(y, m + 1, 0).getDate();
+      var cells = [];
+      for (var i = 0; i < offset; i++) cells.push('<td class="cal-out"></td>');
+      for (var d = 1; d <= daysInMonth; d++) {
+        var key = prefix + "-" + pad(d);
+        var evs = byDay[key] || [];
+        var cls = "cal-day" + (key === today ? " is-today" : "") + (key < today ? " is-past" : "") + (evs.length ? " has-events" : "");
+        var cell;
+        if (evs.length) {
+          var label = fmtDay(key, { weekday: "long", month: "long", day: "numeric" }) + ": " +
+            evs.map(function (e) { return e.title; }).join(", ");
+          cell = '<td class="' + cls + '" data-day="' + key + '">' +
+            '<button type="button" class="cal-date" aria-label="' + esc(label) + '">' + d + "</button>" +
+            '<div class="cal-chips" aria-hidden="true">' + evs.map(function (e) {
+              return '<span class="cal-chip">' + flyerImg(e, 80, "", "") + "<span>" + esc(e.title) + "</span></span>";
+            }).join("") + "</div>" +
+            '<div class="cal-dots" aria-hidden="true">' + evs.slice(0, 3).map(function () { return "<i></i>"; }).join("") + "</div>" +
+            "</td>";
+        } else {
+          cell = '<td class="' + cls + '"><span class="cal-date">' + d + "</span></td>";
+        }
+        cells.push(cell);
+      }
+      while (cells.length % 7) cells.push('<td class="cal-out"></td>');
+      var rows = [];
+      for (var r = 0; r < cells.length; r += 7) rows.push("<tr>" + cells.slice(r, r + 7).join("") + "</tr>");
+      calBody.innerHTML = rows.join("");
+
+      // List below the grid: each event happening this month, once, by its first date here.
+      var inMonth = allEvents
+        .map(function (e) {
+          var here = e.days.filter(function (k) { return k.indexOf(prefix) === 0; });
+          return { e: e, here: here };
+        })
+        .filter(function (x) { return x.here.length; })
+        .sort(function (a, b) { return a.here[0] < b.here[0] ? -1 : a.here[0] > b.here[0] ? 1 : 0; });
+      calListTitle.textContent = "Events in " + view.toLocaleDateString("en-US", { month: "long" });
+      if (calState !== "ready") {
+        calList.innerHTML = '<p class="events-empty">' + (calState === "error"
+          ? "The calendar couldn’t load right now — please check back soon." : "Loading events…") + "</p>";
+        return;
+      }
+      calList.innerHTML = inMonth.length ? inMonth.map(function (x) {
+        var e = x.e, first = x.here[0], lastHere = x.here[x.here.length - 1];
+        var when = e.endDate ? fmtRange(e.startDate, e.endDate)
+          : x.here.map(function (k) { return fmtDay(k, { weekday: "short", month: "short", day: "numeric" }); }).join(", ");
+        var meta = [when, e.time, e.location].filter(Boolean).join(" · ");
+        return '<button type="button" class="event-row cal-row' + (lastHere < today ? " is-past" : "") + '" data-day="' + first + '">' +
+          '<span class="event-date-badge"><span class="month">' + esc(fmtDay(first, { month: "short" })) + '</span><span class="day">' + parseDay(first).getDate() + "</span></span>" +
+          '<span class="event-row-body"><span class="event-row-title">' + esc(e.title) + '</span><span class="event-row-meta">' + esc(meta) + "</span></span>" +
+          flyerImg(e, 120, "cal-row-thumb", "") +
+          "</button>";
+      }).join("") : '<p class="events-empty">Nothing on the calendar for ' + esc(monthName) + " yet.</p>";
+    };
+
+    var renderFlyer = function (e, key) {
+      var when = e.endDate ? fmtRange(e.startDate, e.endDate) : "";
+      var others = e.endDate ? [] : e.days.filter(function (k) { return k !== key; });
+      var also = others.length ? "Also on " + others.slice(0, 6).map(function (k) { return fmtDay(k, { month: "short", day: "numeric" }); }).join(", ") + (others.length > 6 ? "…" : "") : "";
+      var buttons = [
+        safeHref(e.url) ? '<a href="' + esc(e.url) + '" class="btn btn-primary" target="_blank" rel="noopener">Learn more</a>' : "",
+        hasFlyer(e) ? '<a href="' + esc(sanityImageUrl(e.image.asset._ref)) + '" class="btn" target="_blank" rel="noopener">Open full flyer</a>' : ""
+      ].join("");
+      return '<article class="cal-flyer">' +
+        flyerImg(e, 1000, "cal-flyer-img", e.image && e.image.alt ? e.image.alt : "Flyer for " + e.title) +
+        '<div class="cal-flyer-info">' +
+          '<h4 class="cal-flyer-title">' + esc(e.title) + "</h4>" +
+          (when ? '<div class="meta">' + calIcon + "<span>" + esc(when) + "</span></div>" : "") +
+          (also ? '<div class="meta">' + calIcon + "<span>" + esc(also) + "</span></div>" : "") +
+          (e.time ? '<div class="meta">' + clockIcon + "<span>" + esc(e.time) + "</span></div>" : "") +
+          (e.location ? '<div class="meta">' + pinIcon + "<span>" + esc(e.location) + "</span></div>" : "") +
+          (e.description ? '<p class="cal-flyer-desc">' + esc(e.description) + "</p>" : "") +
+          (buttons ? '<div class="cal-flyer-buttons">' + buttons + "</div>" : "") +
+        "</div></article>";
+    };
+
+    // Keep ?day= in the address bar so a specific day's flyers can be shared.
+    var setDayParam = function (key) {
+      try {
+        var url = new URL(window.location.href);
+        if (key) url.searchParams.set("day", key); else url.searchParams.delete("day");
+        history.replaceState(null, "", url.toString());
+      } catch (err) {}
+    };
+
+    var openDay = function (key, trigger) {
+      var evs = byDay[key];
+      if (!evs || !evs.length) return;
+      lastTrigger = trigger || null;
+      dialogTitle.textContent = fmtDay(key, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+      dialogBody.innerHTML = evs.map(function (e) { return renderFlyer(e, key); }).join("");
+      if (typeof calDialog.showModal === "function") calDialog.showModal(); else calDialog.setAttribute("open", "");
+      dialogBody.scrollTop = 0;
+      setDayParam(key);
+    };
+
+    cal.addEventListener("click", function (ev) {
+      var navBtn = ev.target.closest("[data-cal]");
+      if (navBtn) {
+        var act = navBtn.getAttribute("data-cal");
+        if (act === "prev") view.setMonth(view.getMonth() - 1);
+        else if (act === "next") view.setMonth(view.getMonth() + 1);
+        else if (act === "today") { view = new Date(); view.setDate(1); }
+        renderMonth();
+        return;
+      }
+      var row = ev.target.closest(".cal-row");
+      if (row) { openDay(row.getAttribute("data-day"), row); return; }
+      var dayCell = ev.target.closest("td.has-events");
+      if (dayCell) openDay(dayCell.getAttribute("data-day"), dayCell.querySelector(".cal-date"));
+    });
+
+    calDialog.addEventListener("click", function (ev) {
+      // Clicking the dimmed backdrop (the dialog element itself) or the close button closes it.
+      if (ev.target === calDialog || ev.target.closest("[data-cal='close']")) calDialog.close();
+    });
+    // Native dialogs close on Escape already; this also covers browsers without showModal().
+    calDialog.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && calDialog.open) { ev.preventDefault(); calDialog.close(); }
+    });
+    calDialog.addEventListener("close", function () {
+      setDayParam(null);
+      if (lastTrigger && document.body.contains(lastTrigger)) lastTrigger.focus();
+    });
+
+    renderMonth();
+    loadEvents()
+      .then(function (events) {
+        allEvents = events;
+        events.forEach(function (e) {
+          e.days.forEach(function (k) { (byDay[k] = byDay[k] || []).push(e); });
+        });
+        calState = "ready";
+        cal.removeAttribute("aria-busy");
+        renderMonth();
+        if (linkedDay) openDay(linkedDay, null);
+      })
+      .catch(function () {
+        calState = "error";
+        cal.removeAttribute("aria-busy");
+        renderMonth();
+      });
   }
 
   /* ---- Homepage: team subtext (Sanity siteSettings) --------------- */

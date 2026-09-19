@@ -72,40 +72,49 @@
         <p class="lead">Upcoming events open to members and the broader NPRA-NY community.</p>
       </div>
 
-      <div class="events-list reveal">
-        <div class="event-row">
-          <div class="event-date-badge"><span class="month">Apr</span><span class="day">9</span></div>
-          <div class="event-row-body">
-            <div class="event-row-title">NPRA National Community Reinvestment Summit</div>
-            <div class="event-row-meta">April 9&ndash;11, 2026 &middot; Lancaster, PA</div>
+      <!-- Monthly calendar: events + flyers from Sanity (js/main.js) -->
+      <div class="cal reveal" id="event-calendar" aria-busy="true">
+        <div class="cal-head">
+          <h3 class="cal-month" id="cal-month" aria-live="polite">Loading calendar&hellip;</h3>
+          <div class="cal-nav">
+            <button type="button" class="btn cal-today" data-cal="today">Today</button>
+            <button type="button" class="cal-arrow" data-cal="prev" aria-label="Previous month">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            </button>
+            <button type="button" class="cal-arrow" data-cal="next" aria-label="Next month">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
+            </button>
           </div>
-          <span class="event-row-type">Convention</span>
         </div>
-        <div class="event-row">
-          <div class="event-date-badge"><span class="month">Jun</span><span class="day">8</span></div>
-          <div class="event-row-body">
-            <div class="event-row-title">National Puerto Rican Day Parade</div>
-            <div class="event-row-meta">June 8, 2026 &middot; Fifth Avenue, New York, NY</div>
-          </div>
-          <span class="event-row-type">Parade</span>
-        </div>
-        <div class="event-row">
-          <div class="event-date-badge"><span class="month">TBD</span><span class="day">&mdash;</span></div>
-          <div class="event-row-body">
-            <div class="event-row-title">Chapter General Meeting</div>
-            <div class="event-row-meta">Date TBD &middot; New York, NY &middot; Virtual option available</div>
-          </div>
-          <span class="event-row-type">Meeting</span>
-        </div>
-        <div class="event-row">
-          <div class="event-date-badge"><span class="month">TBD</span><span class="day">&mdash;</span></div>
-          <div class="event-row-body">
-            <div class="event-row-title">Community Networking Reception</div>
-            <div class="event-row-meta">Date TBD &middot; New York, NY</div>
-          </div>
-          <span class="event-row-type">Networking</span>
-        </div>
+        <table class="cal-grid">
+          <thead>
+            <tr>
+              <th scope="col"><abbr title="Sunday">Sun</abbr></th>
+              <th scope="col"><abbr title="Monday">Mon</abbr></th>
+              <th scope="col"><abbr title="Tuesday">Tue</abbr></th>
+              <th scope="col"><abbr title="Wednesday">Wed</abbr></th>
+              <th scope="col"><abbr title="Thursday">Thu</abbr></th>
+              <th scope="col"><abbr title="Friday">Fri</abbr></th>
+              <th scope="col"><abbr title="Saturday">Sat</abbr></th>
+            </tr>
+          </thead>
+          <tbody id="cal-body"></tbody>
+        </table>
+        <h3 class="cal-list-title" id="cal-list-title">This month</h3>
+        <div class="events-list cal-list" id="cal-list"></div>
       </div>
+
+      <dialog class="cal-dialog" id="cal-dialog" aria-labelledby="cal-dialog-title">
+        <div class="cal-dialog-inner">
+          <div class="cal-dialog-head">
+            <h3 class="cal-dialog-title" id="cal-dialog-title"></h3>
+            <button type="button" class="cal-close" data-cal="close" aria-label="Close">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="cal-dialog-body" id="cal-dialog-body"></div>
+        </div>
+      </dialog>
 
       <div style="margin-top: 1.5rem;" class="reveal">
         <a href="join.html" class="btn">Become a member to receive event invitations &rarr;</a>
