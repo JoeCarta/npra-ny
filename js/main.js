@@ -232,29 +232,45 @@
     return eventsPromise;
   }
 
+  function byKey(a, b) { return a.key < b.key ? -1 : a.key > b.key ? 1 : 0; }
+  // Each event's next date from today on (events that are over drop off), soonest first.
+  function upcomingEvents(events, limit) {
+    var today = dayKey(new Date());
+    return events
+      .map(function (e) { return { e: e, key: e.days.filter(function (k) { return k >= today; })[0] }; })
+      .filter(function (x) { return x.key; })
+      .sort(byKey)
+      .slice(0, limit);
+  }
+  // Multi-day events show their whole range; repeating ones show the given date.
+  function whenLabel(e, key) {
+    return e.endDate && key >= e.startDate && key <= e.endDate ? fmtRange(e.startDate, e.endDate) : fmtDay(key, LONG_DATE);
+  }
+  // A list row (members page + calendar month list) that opens that day's flyers.
+  function eventRow(e, key, meta, past) {
+    return '<button type="button" class="event-row cal-row' + (past ? " is-past" : "") + '" data-cal-day="' + key + '">' +
+      '<span class="event-date-badge"><span class="month">' + esc(fmtDay(key, { month: "short" })) + '</span><span class="day">' + parseDay(key).getDate() + "</span></span>" +
+      '<span class="event-row-body"><span class="event-row-title">' + esc(e.title) + '</span><span class="event-row-meta">' + esc(meta) + "</span></span>" +
+      flyerImg(e, 120, "cal-row-thumb", "") +
+      "</button>";
+  }
+
   /* ---- Homepage: next three upcoming events ----------------------- */
   var eventsGrid = document.getElementById("events-grid");
   if (eventsGrid) {
     loadEvents()
       .then(function (events) {
-        var today = dayKey(new Date());
-        var upcoming = events
-          .map(function (e) { return { e: e, next: e.days.filter(function (k) { return k >= today; })[0] }; })
-          .filter(function (x) { return x.next; })
-          .sort(function (a, b) { return a.next < b.next ? -1 : a.next > b.next ? 1 : 0; })
-          .slice(0, 3);
+        var upcoming = upcomingEvents(events, 3);
         if (!upcoming.length) {
           eventsGrid.innerHTML = '<p class="events-empty">Stay tuned for upcoming events.</p>';
           return;
         }
         eventsGrid.innerHTML = upcoming.map(function (x) {
           var e = x.e;
-          // Multi-day events show their whole range; repeating ones show the next date.
-          var when = e.endDate && x.next <= e.endDate ? fmtRange(e.startDate, e.endDate) : fmtDay(x.next, LONG_DATE);
-          return '<a href="' + calendarLink(x.next) + '" class="event">' +
+          return '<a href="' + calendarLink(x.key) + '" class="event" data-cal-day="' + x.key + '">' +
             (hasFlyer(e) ? '<div class="event-media">' + flyerImg(e, 800, "", "") + "</div>" : "") +
             '<div class="event-body"><h3>' + esc(e.title) + "</h3>" +
-            '<div class="meta">' + calIcon + "<span>" + esc(when) + "</span></div>" +
+            '<div class="meta">' + calIcon + "<span>" + esc(whenLabel(e, x.key)) + "</span></div>" +
             (e.time ? '<div class="meta">' + clockIcon + "<span>" + esc(e.time) + "</span></div>" : "") +
             (e.location ? '<div class="meta">' + pinIcon + "<span>" + esc(e.location) + "</span></div>" : "") +
             "</div></a>";
@@ -263,26 +279,85 @@
       .catch(function () { eventsGrid.innerHTML = '<p class="events-empty">Events are unavailable right now — please check back soon.</p>'; });
   }
 
-  /* ---- Members page: monthly calendar with flyers ----------------- */
-  var cal = document.getElementById("event-calendar");
-  var calDialog = document.getElementById("cal-dialog");
-  if (cal && calDialog) {
-    var calBody = document.getElementById("cal-body");
-    var calMonth = document.getElementById("cal-month");
-    var calList = document.getElementById("cal-list");
-    var calListTitle = document.getElementById("cal-list-title");
-    var dialogTitle = document.getElementById("cal-dialog-title");
-    var dialogBody = document.getElementById("cal-dialog-body");
+  /* ---- Members page: upcoming events list ------------------------- */
+  var upcomingList = document.getElementById("upcoming-list");
+  if (upcomingList) {
+    loadEvents()
+      .then(function (events) {
+        var upcoming = upcomingEvents(events, 8);
+        upcomingList.innerHTML = upcoming.length
+          ? upcoming.map(function (x) {
+              return eventRow(x.e, x.key, [whenLabel(x.e, x.key), x.e.time, x.e.location].filter(Boolean).join(" · "), false);
+            }).join("")
+          : '<p class="events-empty">No upcoming events on the calendar right now — check back soon.</p>';
+      })
+      .catch(function () { upcomingList.innerHTML = '<p class="events-empty">Events are unavailable right now — please check back soon.</p>'; });
+  }
+
+  /* ---- Monthly calendar (full-screen view, opened by [data-open-calendar]) --
+     Month view: grid + that month's list. Day view: the day's full flyers.
+     "Back to calendar" (or Escape / phone back) returns from a day to the month;
+     "Close" returns to the page. ?day=YYYY-MM-DD opens straight to a day. */
+  if (document.querySelector("[data-open-calendar]")) {
+    var chevronLeft = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>';
+    var chevronRight = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>';
+    var closeX = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>';
+    var weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    var calDialog = document.createElement("dialog");
+    calDialog.className = "cal-dialog";
+    calDialog.setAttribute("aria-labelledby", "cal-title");
+    calDialog.innerHTML =
+      '<div class="cal-dialog-inner">' +
+        '<div class="cal-bar">' +
+          '<button type="button" class="cal-bar-btn cal-back" data-cal="back" hidden>' + chevronLeft + "<span>Back to calendar</span></button>" +
+          '<h2 class="cal-bar-title" id="cal-title">Events calendar</h2>' +
+          '<button type="button" class="cal-bar-btn cal-close" data-cal="close">' + closeX + "<span>Close</span></button>" +
+        "</div>" +
+        '<div class="cal-view" data-view="month">' +
+          '<div class="cal-head">' +
+            '<h3 class="cal-month" aria-live="polite"></h3>' +
+            '<div class="cal-nav">' +
+              '<button type="button" class="btn cal-today" data-cal="today">Today</button>' +
+              '<button type="button" class="cal-arrow" data-cal="prev" aria-label="Previous month">' + chevronLeft + "</button>" +
+              '<button type="button" class="cal-arrow" data-cal="next" aria-label="Next month">' + chevronRight + "</button>" +
+            "</div>" +
+          "</div>" +
+          '<table class="cal-grid"><thead><tr>' +
+            weekdays.map(function (w) { return '<th scope="col"><abbr title="' + w + '">' + w.slice(0, 3) + "</abbr></th>"; }).join("") +
+          "</tr></thead><tbody></tbody></table>" +
+          '<h3 class="cal-list-title"></h3>' +
+          '<div class="events-list cal-list"></div>' +
+        "</div>" +
+        '<div class="cal-view" data-view="day" hidden>' +
+          '<h3 class="cal-day-title" tabindex="-1"></h3>' +
+          '<div class="cal-day-body"></div>' +
+          '<button type="button" class="btn cal-back-bottom" data-cal="back">' + chevronLeft + "<span>Back to calendar</span></button>" +
+        "</div>" +
+      "</div>";
+    document.body.appendChild(calDialog);
+
+    var q = function (sel) { return calDialog.querySelector(sel); };
+    var calInner = q(".cal-dialog-inner");
+    var calBack = q(".cal-back");
+    var calTitle = q(".cal-bar-title");
+    var monthView = q('[data-view="month"]');
+    var dayView = q('[data-view="day"]');
+    var calMonth = q(".cal-month");
+    var calBody = q(".cal-grid tbody");
+    var calListTitle = q(".cal-list-title");
+    var calList = q(".cal-list");
+    var dayTitle = q(".cal-day-title");
+    var dayBody = q(".cal-day-body");
+
     var byDay = {};
     var allEvents = [];
-    var lastTrigger = null;
     var calState = "loading"; // loading | ready | error
+    var mode = "month";       // month | day
+    var currentDay = null;
+    var lastTrigger = null;
     var view = new Date();
     view.setDate(1);
-
-    var linkedDay = new URLSearchParams(window.location.search).get("day");
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(linkedDay || "")) linkedDay = null;
-    if (linkedDay) view = parseDay(linkedDay.slice(0, 8) + "01");
 
     var renderMonth = function () {
       var y = view.getFullYear(), m = view.getMonth();
@@ -292,59 +367,49 @@
       calMonth.textContent = monthName;
 
       // Grid: blank cells before the 1st, one cell per day, blanks to finish the last week.
-      var offset = view.getDay();
-      var daysInMonth = new Date(y, m + 1, 0).getDate();
       var cells = [];
-      for (var i = 0; i < offset; i++) cells.push('<td class="cal-out"></td>');
+      for (var i = 0; i < view.getDay(); i++) cells.push('<td class="cal-out"></td>');
+      var daysInMonth = new Date(y, m + 1, 0).getDate();
       for (var d = 1; d <= daysInMonth; d++) {
         var key = prefix + "-" + pad(d);
         var evs = byDay[key] || [];
         var cls = "cal-day" + (key === today ? " is-today" : "") + (key < today ? " is-past" : "") + (evs.length ? " has-events" : "");
-        var cell;
-        if (evs.length) {
-          var label = fmtDay(key, { weekday: "long", month: "long", day: "numeric" }) + ": " +
-            evs.map(function (e) { return e.title; }).join(", ");
-          cell = '<td class="' + cls + '" data-day="' + key + '">' +
-            '<button type="button" class="cal-date" aria-label="' + esc(label) + '">' + d + "</button>" +
-            '<div class="cal-chips" aria-hidden="true">' + evs.map(function (e) {
-              return '<span class="cal-chip">' + flyerImg(e, 80, "", "") + "<span>" + esc(e.title) + "</span></span>";
-            }).join("") + "</div>" +
-            '<div class="cal-dots" aria-hidden="true">' + evs.slice(0, 3).map(function () { return "<i></i>"; }).join("") + "</div>" +
-            "</td>";
-        } else {
-          cell = '<td class="' + cls + '"><span class="cal-date">' + d + "</span></td>";
+        if (!evs.length) {
+          cells.push('<td class="' + cls + '"><span class="cal-date">' + d + "</span></td>");
+          continue;
         }
-        cells.push(cell);
+        var label = fmtDay(key, { weekday: "long", month: "long", day: "numeric" }) + ": " +
+          evs.map(function (e) { return e.title; }).join(", ");
+        cells.push('<td class="' + cls + '" data-day="' + key + '">' +
+          '<button type="button" class="cal-date" aria-label="' + esc(label) + '">' + d + "</button>" +
+          '<div class="cal-chips" aria-hidden="true">' + evs.map(function (e) {
+            return '<span class="cal-chip">' + flyerImg(e, 80, "", "") + "<span>" + esc(e.title) + "</span></span>";
+          }).join("") + "</div>" +
+          '<div class="cal-dots" aria-hidden="true">' + evs.slice(0, 3).map(function () { return "<i></i>"; }).join("") + "</div>" +
+          "</td>");
       }
       while (cells.length % 7) cells.push('<td class="cal-out"></td>');
       var rows = [];
       for (var r = 0; r < cells.length; r += 7) rows.push("<tr>" + cells.slice(r, r + 7).join("") + "</tr>");
       calBody.innerHTML = rows.join("");
 
-      // List below the grid: each event happening this month, once, by its first date here.
-      var inMonth = allEvents
-        .map(function (e) {
-          var here = e.days.filter(function (k) { return k.indexOf(prefix) === 0; });
-          return { e: e, here: here };
-        })
-        .filter(function (x) { return x.here.length; })
-        .sort(function (a, b) { return a.here[0] < b.here[0] ? -1 : a.here[0] > b.here[0] ? 1 : 0; });
+      // List under the grid: each event happening this month, once, by its first date here.
       calListTitle.textContent = "Events in " + view.toLocaleDateString("en-US", { month: "long" });
       if (calState !== "ready") {
         calList.innerHTML = '<p class="events-empty">' + (calState === "error"
           ? "The calendar couldn’t load right now — please check back soon." : "Loading events…") + "</p>";
         return;
       }
+      var inMonth = allEvents
+        .map(function (e) { return { e: e, here: e.days.filter(function (k) { return k.indexOf(prefix) === 0; }) }; })
+        .filter(function (x) { return x.here.length; })
+        .map(function (x) { x.key = x.here[0]; return x; })
+        .sort(byKey);
       calList.innerHTML = inMonth.length ? inMonth.map(function (x) {
-        var e = x.e, first = x.here[0], lastHere = x.here[x.here.length - 1];
+        var e = x.e;
         var when = e.endDate ? fmtRange(e.startDate, e.endDate)
           : x.here.map(function (k) { return fmtDay(k, { weekday: "short", month: "short", day: "numeric" }); }).join(", ");
-        var meta = [when, e.time, e.location].filter(Boolean).join(" · ");
-        return '<button type="button" class="event-row cal-row' + (lastHere < today ? " is-past" : "") + '" data-day="' + first + '">' +
-          '<span class="event-date-badge"><span class="month">' + esc(fmtDay(first, { month: "short" })) + '</span><span class="day">' + parseDay(first).getDate() + "</span></span>" +
-          '<span class="event-row-body"><span class="event-row-title">' + esc(e.title) + '</span><span class="event-row-meta">' + esc(meta) + "</span></span>" +
-          flyerImg(e, 120, "cal-row-thumb", "") +
-          "</button>";
+        return eventRow(e, x.key, [when, e.time, e.location].filter(Boolean).join(" · "), x.here[x.here.length - 1] < today);
       }).join("") : '<p class="events-empty">Nothing on the calendar for ' + esc(monthName) + " yet.</p>";
     };
 
@@ -369,7 +434,7 @@
         "</div></article>";
     };
 
-    // Keep ?day= in the address bar so a specific day's flyers can be shared.
+    // Keep ?day= in the address bar while a day is open, so it can be shared.
     var setDayParam = function (key) {
       try {
         var url = new URL(window.location.href);
@@ -378,47 +443,101 @@
       } catch (err) {}
     };
 
-    var openDay = function (key, trigger) {
-      var evs = byDay[key];
-      if (!evs || !evs.length) return;
-      lastTrigger = trigger || null;
-      dialogTitle.textContent = fmtDay(key, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
-      dialogBody.innerHTML = evs.map(function (e) { return renderFlyer(e, key); }).join("");
-      if (typeof calDialog.showModal === "function") calDialog.showModal(); else calDialog.setAttribute("open", "");
-      dialogBody.scrollTop = 0;
-      setDayParam(key);
+    var showMonth = function () {
+      var fromDay = mode === "day" ? currentDay : null;
+      mode = "month";
+      currentDay = null;
+      dayView.hidden = true;
+      monthView.hidden = false;
+      calBack.hidden = true;
+      calTitle.hidden = false;
+      renderMonth();
+      setDayParam(null);
+      // Coming back from a day: put focus back on that day in the grid.
+      var cell = fromDay && calBody.querySelector('td[data-day="' + fromDay + '"] .cal-date');
+      if (cell) cell.focus();
     };
 
-    cal.addEventListener("click", function (ev) {
-      var navBtn = ev.target.closest("[data-cal]");
-      if (navBtn) {
-        var act = navBtn.getAttribute("data-cal");
-        if (act === "prev") view.setMonth(view.getMonth() - 1);
-        else if (act === "next") view.setMonth(view.getMonth() + 1);
-        else if (act === "today") { view = new Date(); view.setDate(1); }
-        renderMonth();
-        return;
+    var showDay = function (key) {
+      var evs = byDay[key];
+      if (!evs || !evs.length) return false;
+      mode = "day";
+      currentDay = key;
+      view = parseDay(key.slice(0, 8) + "01"); // "Back" lands on this day's month
+      dayTitle.textContent = fmtDay(key, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+      dayBody.innerHTML = evs.map(function (e) { return renderFlyer(e, key); }).join("");
+      monthView.hidden = true;
+      dayView.hidden = false;
+      calBack.hidden = false;
+      calTitle.hidden = true;
+      calInner.scrollTop = 0;
+      setDayParam(key);
+      dayTitle.focus();
+      return true;
+    };
+
+    var openCalendar = function (day, trigger) {
+      lastTrigger = trigger || null;
+      if (!calDialog.open) {
+        if (typeof calDialog.showModal === "function") calDialog.showModal(); else calDialog.setAttribute("open", "");
       }
-      var row = ev.target.closest(".cal-row");
-      if (row) { openDay(row.getAttribute("data-day"), row); return; }
-      var dayCell = ev.target.closest("td.has-events");
-      if (dayCell) openDay(dayCell.getAttribute("data-day"), dayCell.querySelector(".cal-date"));
+      if (!(day && showDay(day))) {
+        if (day) view = parseDay(day.slice(0, 8) + "01");
+        showMonth();
+        calInner.scrollTop = 0;
+      }
+    };
+
+    // Step back one level: day → month, month → closed.
+    var stepBack = function () {
+      if (mode === "day") showMonth(); else calDialog.close();
+    };
+
+    document.addEventListener("click", function (ev) {
+      var opener = ev.target.closest("[data-open-calendar]");
+      if (opener) { ev.preventDefault(); openCalendar(null, opener); return; }
+      var dayLink = ev.target.closest("[data-cal-day]");
+      if (!dayLink) return;
+      ev.preventDefault();
+      var key = dayLink.getAttribute("data-cal-day");
+      if (calDialog.open) showDay(key); else openCalendar(key, dayLink);
     });
 
     calDialog.addEventListener("click", function (ev) {
-      // Clicking the dimmed backdrop (the dialog element itself) or the close button closes it.
-      if (ev.target === calDialog || ev.target.closest("[data-cal='close']")) calDialog.close();
+      if (ev.target === calDialog) { calDialog.close(); return; } // dimmed backdrop (desktop)
+      var btn = ev.target.closest("[data-cal]");
+      if (btn) {
+        var act = btn.getAttribute("data-cal");
+        if (act === "close") calDialog.close();
+        else if (act === "back") showMonth();
+        else {
+          if (act === "prev") view.setMonth(view.getMonth() - 1);
+          else if (act === "next") view.setMonth(view.getMonth() + 1);
+          else if (act === "today") { view = new Date(); view.setDate(1); }
+          renderMonth();
+        }
+        return;
+      }
+      var cell = ev.target.closest("td.has-events");
+      if (cell) showDay(cell.getAttribute("data-day"));
     });
-    // Native dialogs close on Escape already; this also covers browsers without showModal().
+
+    // Escape and the phone back gesture step back instead of always closing.
+    calDialog.addEventListener("cancel", function (ev) {
+      if (mode === "day") { ev.preventDefault(); showMonth(); }
+    });
     calDialog.addEventListener("keydown", function (ev) {
-      if (ev.key === "Escape" && calDialog.open) { ev.preventDefault(); calDialog.close(); }
+      if (ev.key === "Escape" && calDialog.open) { ev.preventDefault(); stepBack(); }
     });
     calDialog.addEventListener("close", function () {
+      mode = "month";
       setDayParam(null);
       if (lastTrigger && document.body.contains(lastTrigger)) lastTrigger.focus();
     });
 
-    renderMonth();
+    var linkedDay = new URLSearchParams(window.location.search).get("day");
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(linkedDay || "")) linkedDay = null;
+
     loadEvents()
       .then(function (events) {
         allEvents = events;
@@ -426,14 +545,12 @@
           e.days.forEach(function (k) { (byDay[k] = byDay[k] || []).push(e); });
         });
         calState = "ready";
-        cal.removeAttribute("aria-busy");
-        renderMonth();
-        if (linkedDay) openDay(linkedDay, null);
+        if (linkedDay) openCalendar(linkedDay, null);
+        else if (calDialog.open && mode === "month") renderMonth();
       })
       .catch(function () {
         calState = "error";
-        cal.removeAttribute("aria-busy");
-        renderMonth();
+        if (calDialog.open && mode === "month") renderMonth();
       });
   }
 

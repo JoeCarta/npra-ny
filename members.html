@@ -66,55 +66,22 @@
   <!-- Events -->
   <section class="section" id="events">
     <div class="container">
-      <div class="section-head reveal">
-        <div class="eyebrow">Calendar</div>
-        <h2 class="h2">Meetings, Parades &amp; Networking</h2>
-        <p class="lead">Upcoming events open to members and the broader NPRA-NY community.</p>
+      <div class="events-top reveal">
+        <div class="section-head" style="margin-bottom:0;">
+          <div class="eyebrow">Calendar</div>
+          <h2 class="h2">Meetings, Parades &amp; Networking</h2>
+          <p class="lead">Upcoming events open to members and the broader NPRA-NY community.</p>
+        </div>
+        <button type="button" class="btn btn-primary cal-open" data-open-calendar>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+          Open monthly calendar
+        </button>
       </div>
 
-      <!-- Monthly calendar: events + flyers from Sanity (js/main.js) -->
-      <div class="cal reveal" id="event-calendar" aria-busy="true">
-        <div class="cal-head">
-          <h3 class="cal-month" id="cal-month" aria-live="polite">Loading calendar&hellip;</h3>
-          <div class="cal-nav">
-            <button type="button" class="btn cal-today" data-cal="today">Today</button>
-            <button type="button" class="cal-arrow" data-cal="prev" aria-label="Previous month">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
-            </button>
-            <button type="button" class="cal-arrow" data-cal="next" aria-label="Next month">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/></svg>
-            </button>
-          </div>
-        </div>
-        <table class="cal-grid">
-          <thead>
-            <tr>
-              <th scope="col"><abbr title="Sunday">Sun</abbr></th>
-              <th scope="col"><abbr title="Monday">Mon</abbr></th>
-              <th scope="col"><abbr title="Tuesday">Tue</abbr></th>
-              <th scope="col"><abbr title="Wednesday">Wed</abbr></th>
-              <th scope="col"><abbr title="Thursday">Thu</abbr></th>
-              <th scope="col"><abbr title="Friday">Fri</abbr></th>
-              <th scope="col"><abbr title="Saturday">Sat</abbr></th>
-            </tr>
-          </thead>
-          <tbody id="cal-body"></tbody>
-        </table>
-        <h3 class="cal-list-title" id="cal-list-title">This month</h3>
-        <div class="events-list cal-list" id="cal-list"></div>
+      <!-- Upcoming events from Sanity; each opens its day in the monthly calendar (js/main.js) -->
+      <div class="events-list reveal" id="upcoming-list">
+        <p class="events-empty">Loading events&hellip;</p>
       </div>
-
-      <dialog class="cal-dialog" id="cal-dialog" aria-labelledby="cal-dialog-title">
-        <div class="cal-dialog-inner">
-          <div class="cal-dialog-head">
-            <h3 class="cal-dialog-title" id="cal-dialog-title"></h3>
-            <button type="button" class="cal-close" data-cal="close" aria-label="Close">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-          </div>
-          <div class="cal-dialog-body" id="cal-dialog-body"></div>
-        </div>
-      </dialog>
 
       <div style="margin-top: 1.5rem;" class="reveal">
         <a href="join.html" class="btn">Become a member to receive event invitations &rarr;</a>
