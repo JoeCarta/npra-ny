@@ -54,15 +54,14 @@
       .map(function (a) { return document.querySelector(a.getAttribute("href")); })
       .filter(Boolean);
     if (targets.length) {
+      // Highlight a section's link only while that section is on screen.
       var navSpy = new IntersectionObserver(function (entries) {
-        var visible = entries.filter(function (e) { return e.isIntersecting; })
-          .sort(function (a, b) { return b.intersectionRatio - a.intersectionRatio; })[0];
-        if (visible && visible.target.id) {
+        entries.forEach(function (e) {
           navLinks.forEach(function (a) {
-            a.classList.toggle("active", a.getAttribute("href") === "#" + visible.target.id);
+            if (a.getAttribute("href") === "#" + e.target.id) a.classList.toggle("active", e.isIntersecting);
           });
-        }
-      }, { threshold: [0.25, 0.5] });
+        });
+      }, { threshold: 0.25 });
       targets.forEach(function (s) { navSpy.observe(s); });
     }
   }
@@ -145,49 +144,6 @@
   }
   function safeHref(href) {
     return /^(https?:|mailto:|tel:)/i.test(href || "") ? href : "";
-  }
-
-  /* ---- Portable Text (rich text from the Studio) → HTML ----------- */
-  function renderSpans(children, markDefs) {
-    var defs = {};
-    (markDefs || []).forEach(function (d) { defs[d._key] = d; });
-    return (children || []).map(function (span) {
-      var out = esc(span.text).replace(/\n/g, "<br>");
-      (span.marks || []).forEach(function (mark) {
-        if (mark === "strong") out = "<strong>" + out + "</strong>";
-        else if (mark === "em") out = "<em>" + out + "</em>";
-        else if (defs[mark] && defs[mark]._type === "link") {
-          var href = safeHref(defs[mark].href);
-          if (!href) return;
-          var external = /^https?:/i.test(href);
-          out = '<a href="' + esc(href) + '"' + (external ? ' target="_blank" rel="noopener"' : "") + ">" + out + "</a>";
-        }
-      });
-      return out;
-    }).join("");
-  }
-  function renderPortableText(blocks) {
-    var html = "";
-    var openList = null;
-    var blockTags = { h2: "h2", h3: "h3", blockquote: "blockquote" };
-    (blocks || []).forEach(function (b) {
-      var listTag = b._type === "block" && b.listItem ? (b.listItem === "number" ? "ol" : "ul") : null;
-      if (openList && openList !== listTag) { html += "</" + openList + ">"; openList = null; }
-      if (listTag && !openList) { html += "<" + listTag + ">"; openList = listTag; }
-
-      if (b._type === "block") {
-        var inner = renderSpans(b.children, b.markDefs);
-        if (listTag) { html += "<li>" + inner + "</li>"; return; }
-        if (!inner.replace(/<br>/g, "").trim()) return; // skip empty paragraphs
-        var tag = blockTags[b.style] || "p";
-        html += "<" + tag + ">" + inner + "</" + tag + ">";
-      } else if (b._type === "image" && b.asset && b.asset._ref) {
-        html += '<figure><img loading="lazy" src="' + sanityImageUrl(b.asset._ref, 1400) + '" alt="' + esc(b.alt) + '">' +
-          (b.caption ? "<figcaption>" + esc(b.caption) + "</figcaption>" : "") + "</figure>";
-      }
-    });
-    if (openList) html += "</" + openList + ">";
-    return html;
   }
 
   /* ---- Events: shared data + date helpers (Sanity) ---------------- */
@@ -563,13 +519,11 @@
   }
 
   /* ---- Newsletter archive + homepage recent issues (Sanity) ------- */
-  var ISSUE_CARD_FIELDS = '{_id, title, "slug": slug.current, issueNumber, publishedAt, summary, tags, link, ' +
-    '"hasArticle": count(article) > 0, "pdfUrl": pdf.asset->url}';
+  var ISSUE_CARD_FIELDS = '{_id, title, "slug": slug.current, issueNumber, publishedAt, summary, tags, link}';
 
-  // Where "Read" goes: the full article on our site, else the PDF, else an outside link.
+  // Every issue has its own page (server-rendered, so its full text is searchable).
   function issueLink(n) {
-    if (n.hasArticle && n.slug) return '<a href="issue.html?i=' + encodeURIComponent(n.slug) + '" class="nl-archive-link">Read the full issue &rarr;</a>';
-    if (n.pdfUrl) return '<a href="' + esc(n.pdfUrl) + '" class="nl-archive-link" target="_blank" rel="noopener">Read the PDF &rarr;</a>';
+    if (n.slug) return '<a href="/la-agenda/' + encodeURIComponent(n.slug) + '" class="nl-archive-link">Read the full issue &rarr;</a>';
     if (safeHref(n.link)) return '<a href="' + esc(n.link) + '" class="nl-archive-link" target="_blank" rel="noopener">Read full issue &rarr;</a>';
     return "";
   }
@@ -615,64 +569,5 @@
         nlRecent.innerHTML = result.map(function (n, i) { return renderIssue(n, i === 0); }).join("");
       })
       .catch(function () {});
-  }
-
-  /* ---- Single issue page (issue.html?i=<page link>) --------------- */
-  var issueHeader = document.getElementById("issue-header");
-  var issueBody = document.getElementById("issue-body");
-  if (issueHeader && issueBody) {
-    var eyebrow = '<div class="eyebrow"><a href="newsletter.html" class="issue-eyebrow-link">La Agenda&#8209;NY</a></div>';
-    var backLink = '<a href="newsletter.html" class="nl-archive-link issue-back">&larr; All issues</a>';
-    var showMissing = function (heading, msg) {
-      issueHeader.removeAttribute("aria-busy");
-      issueHeader.innerHTML = eyebrow + '<h1 class="page-title issue-title">' + heading + "</h1>";
-      issueBody.innerHTML = '<p class="lead">' + msg + "</p>" + '<div class="issue-actions">' + backLink + "</div>";
-    };
-    var slug = new URLSearchParams(window.location.search).get("i");
-    if (!slug) {
-      showMissing("Issue not found", "This link is missing the issue it points to.");
-    } else {
-      fetchJSON(
-        '*[_type=="newsletter" && slug.current==$slug][0]{title, issueNumber, publishedAt, author, summary, tags, link, ' +
-        'coverImage{alt, asset}, article, "pdfUrl": pdf.asset->url}',
-        { slug: slug }
-      )
-        .then(function (data) {
-          var n = data.result;
-          if (!n) {
-            showMissing("Issue not found", "We couldn’t find that issue. It may not be published yet, or its link may have changed.");
-            return;
-          }
-          document.title = n.title + " — La Agenda-NY";
-          var metaDesc = document.querySelector('meta[name="description"]');
-          if (metaDesc && n.summary) metaDesc.setAttribute("content", n.summary);
-
-          var meta = [
-            n.publishedAt ? '<span class="issue-date">' + esc(fmtDate(n.publishedAt, true)) + "</span>" : "",
-            n.issueNumber ? "<span>Issue #" + esc(n.issueNumber) + "</span>" : "",
-            n.author ? "<span>By " + esc(n.author) + "</span>" : ""
-          ].join("");
-          issueHeader.removeAttribute("aria-busy");
-          issueHeader.innerHTML = eyebrow +
-            '<h1 class="page-title issue-title">' + esc(n.title) + "</h1>" +
-            (meta ? '<p class="issue-meta">' + meta + "</p>" : "") +
-            (n.summary ? '<p class="lead">' + esc(n.summary) + "</p>" : "");
-
-          var cover = n.coverImage && n.coverImage.asset && n.coverImage.asset._ref
-            ? '<figure class="issue-cover"><img src="' + sanityImageUrl(n.coverImage.asset._ref, 1600) + '" alt="' + esc(n.coverImage.alt) + '"></figure>'
-            : "";
-          var actions = [
-            n.pdfUrl ? '<a href="' + esc(n.pdfUrl) + '" class="btn btn-primary" target="_blank" rel="noopener">Read the PDF</a>' : "",
-            safeHref(n.link) ? '<a href="' + esc(n.link) + '" class="btn" target="_blank" rel="noopener">View this issue online</a>' : ""
-          ].join("");
-          issueBody.innerHTML = cover +
-            '<div class="prose">' + renderPortableText(n.article) + "</div>" +
-            (actions ? '<div class="issue-buttons">' + actions + "</div>" : "") +
-            '<div class="issue-actions">' + renderTags(n.tags) + backLink + "</div>";
-        })
-        .catch(function () {
-          showMissing("Couldn’t load this issue", "This issue couldn’t load right now. Please try again in a moment.");
-        });
-    }
   }
 })();

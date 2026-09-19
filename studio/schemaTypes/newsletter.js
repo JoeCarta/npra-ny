@@ -48,7 +48,7 @@ export const newsletter = defineType({
       name: 'slug',
       title: 'Page link',
       type: 'slug',
-      description: 'Click “Generate” to create this from the headline. It becomes the end of this issue’s web address.',
+      description: 'Click “Generate” to create this from the headline. The issue’s page will be nprany.org/la-agenda/ followed by this.',
       options: {source: 'title', maxLength: 80, slugify},
       validation: (rule) => rule.required().error('Click “Generate” to create the page link.'),
     }),
@@ -97,7 +97,9 @@ export const newsletter = defineType({
       name: 'article',
       title: 'Full article',
       type: 'array',
-      description: 'Write here, or paste straight from Google Docs or Word; bold, italics, headings, lists and links carry over.',
+      description: 'Required. Type it here or paste straight from Google Docs or Word (bold, italics, headings, lists and links carry over). This text becomes the issue’s own web page, which is what Google can find and read. A PDF or image alone can’t be searched.',
+      validation: (rule) =>
+        rule.required().error('Add the full text of the issue. It’s what readers and Google see on the issue’s page.'),
       of: [
         defineArrayMember({
           type: 'block',
@@ -158,7 +160,7 @@ export const newsletter = defineType({
       name: 'pdf',
       title: 'PDF version',
       type: 'file',
-      description: 'Optional. If this issue was designed as a PDF (Canva, InDesign, etc.), upload it and readers get a download button.',
+      description: 'Optional extra. If the issue was also designed as a PDF (Canva, InDesign, etc.), upload it and readers get a download button. The full text above is still needed.',
       options: {accept: 'application/pdf'},
     }),
     defineField({

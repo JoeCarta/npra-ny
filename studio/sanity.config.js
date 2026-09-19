@@ -24,7 +24,7 @@ export default defineConfig({
     // Adds "Open preview" to the document menu, linking to the live issue page.
     productionUrl: async (prev, {document}) => {
       if (document._type === 'newsletter' && document.slug?.current) {
-        return `${SITE_URL}/issue.html?i=${encodeURIComponent(document.slug.current)}`
+        return `${SITE_URL}/la-agenda/${encodeURIComponent(document.slug.current)}`
       }
       return prev
     },
