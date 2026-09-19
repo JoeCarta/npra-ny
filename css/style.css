@@ -248,6 +248,16 @@ a { color: inherit; }
 @media (max-width: 559px){
   .actions .btn-primary{ display: none; }
 }
+/* Small phones: let long button labels wrap instead of pushing the page sideways,
+   and shrink the wordmark so it clears the menu button. */
+@media (max-width: 480px){
+  .btn{ white-space: normal; text-align: center; }
+  .header .logo img{ height: 40px; }
+  .header .logo-text{ font-size: 0.86rem; letter-spacing: 0.03em; }
+}
+@media (max-width: 360px){
+  .header .logo-text{ font-size: 0.78rem; }
+}
 
 /* ---------------------------------------------------------------
    Sections
