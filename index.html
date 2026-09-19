@@ -59,36 +59,41 @@
     </div>
   </header>
 
-  <!-- Hero -->
+  <!-- Hero: type on an oxblood field, no photograph -->
   <section class="hero" id="top">
-    <div class="hero-bg">
-      <img src="assets/images/El-Barrio_0059-copy.jpg" alt="Puerto Rican community members gathered in El Barrio, New York" />
-    </div>
+    <div class="hero-mark" aria-hidden="true">NY</div>
     <div class="container">
-      <div class="hero-content reveal">
-        <span class="kicker">National Puerto Rican Agenda</span>
-        <h1 class="h1">New York Chapter</h1>
-        <p>An engaged network of change-makers working to unite, educate, and empower the Puerto Rican community across New York.</p>
+      <h1 class="hero-title">
+        <span class="hero-kicker">National Puerto Rican Agenda</span>
+        <span class="hero-line">New York</span>
+        <span class="hero-line">Chapter</span>
+      </h1>
+      <div class="hero-rule" aria-hidden="true"></div>
+      <div class="hero-foot">
+        <p class="hero-lead">An engaged network of change-makers working to unite, educate, and empower the Puerto Rican community across New York.</p>
         <div class="hero-cta">
-          <a href="join.html" class="btn btn-primary btn-lg">
+          <a href="join.html" class="btn btn-lg hero-btn-primary">
             Join Our Movement
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
-          <a href="#our-story" class="btn btn-lg">Our Story</a>
+          <a href="#our-story" class="btn btn-lg hero-btn">Our Story</a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Our Story -->
-  <section id="our-story" class="section">
+  <section id="our-story" class="section story">
     <div class="container">
       <div class="story-grid">
-        <div class="story-media reveal">
-          <img src="assets/images/brandon.png" alt="NPRA-NY members and leaders at a community gathering" />
+        <div class="story-aside reveal">
+          <h2 class="h2">Our Story</h2>
+          <ol class="story-timeline">
+            <li><span class="story-year">2016</span><span class="story-event">The National Puerto Rican Agenda forms in Camden, NJ</span></li>
+            <li><span class="story-year">2017</span><span class="story-event">The New York State Chapter is established</span></li>
+          </ol>
         </div>
-        <div class="reveal">
-          <div class="eyebrow">Our Story</div>
+        <div class="story-main reveal">
           <p class="story-lead">The New York State Chapter of the National Puerto Rican Agenda is a pioneering coalition-building arm of the national organization.</p>
           <p class="story-body">Established in 2017 following the 2016 formation of NPRA in Camden, NJ, NPRA-NY is a nonpartisan alliance of statewide organizations, community leaders, and grassroots organizers. We work with city and state government to advance economic, educational, and healthcare equity for Puerto Rican communities across New York.</p>
           <div class="story-actions">
@@ -105,7 +110,7 @@
   <section id="our-work" class="section mission">
     <div class="container">
       <div class="mission-inner reveal">
-        <div class="eyebrow">Our Mission</div>
+        <h2 class="mission-label">Our Mission</h2>
         <p class="mission-quote">To unite, educate, and empower Puerto Rican communities through collaboration, strategic partnerships, and civic engagement &mdash; toward <span class="accent">an equitable and sustainable future</span> where our communities can heal, grow, and thrive.</p>
       </div>
     </div>
@@ -114,36 +119,31 @@
   <!-- What We Do -->
   <section class="section" id="initiatives">
     <div class="container">
-      <div class="section-head reveal">
-        <div class="eyebrow">What We Do</div>
+      <div class="section-head section-head--split reveal">
         <h2 class="h2">Our Focus Areas</h2>
         <p class="lead">We provide a forum for strategic, creative, and collaborative alliances &mdash; leveraging political influence to achieve shared social, economic, and policy goals for New York's Puerto Rican community.</p>
       </div>
 
-      <div class="focus-list">
+      <div class="focus-grid">
         <div class="focus-item reveal">
-          <div class="focus-num">01</div>
           <div class="focus-body">
             <h3>Economic Development</h3>
             <p>Tech training, financial planning, workforce development, and entrepreneurial and small-business programs to build lasting economic power in our community.</p>
           </div>
         </div>
         <div class="focus-item reveal">
-          <div class="focus-num">02</div>
           <div class="focus-body">
             <h3>Health</h3>
             <p>Culturally relevant access to holistic healthcare, nutritional resources, and safe public spaces for exercise and play &mdash; because healthy communities are strong communities.</p>
           </div>
         </div>
         <div class="focus-item reveal">
-          <div class="focus-num">03</div>
           <div class="focus-body">
             <h3>Housing</h3>
             <p>Stemming the tide of displacement and pursuing equitable, affordable housing that allows Puerto Ricans to stay and thrive in their communities across New York.</p>
           </div>
         </div>
         <div class="focus-item reveal">
-          <div class="focus-num">04</div>
           <div class="focus-body">
             <h3>Education</h3>
             <p>Building tomorrow's leaders and advocates through mentorship, opportunity, and community &mdash; from youth programs to civic education for all ages.</p>
@@ -157,7 +157,6 @@
   <section id="team" class="section">
     <div class="container">
       <div class="section-head reveal">
-        <div class="eyebrow">Our Team</div>
         <h2 class="h2">Meet the Board</h2>
         <p class="lead" id="team-subtext">The leaders guiding NPRA-NY's work bring decades of advocacy, public service, and community organizing to the chapter.</p>
       </div>
@@ -324,7 +323,6 @@
     <div class="container">
       <div class="events-top reveal">
         <div class="section-head" style="margin-bottom:0;">
-          <div class="eyebrow">Get Involved</div>
           <h2 class="h2">Upcoming Events</h2>
         </div>
         <button type="button" class="btn cal-open" data-open-calendar>
@@ -343,8 +341,7 @@
     <div class="container">
       <div class="newsletter-grid">
         <div class="newsletter-left reveal">
-          <div class="eyebrow">Stay Connected</div>
-          <img src="assets/images/La_Agenda_Banner_White.png" class="newsletter-logo" alt="La Agenda-NY" style="filter: invert(1) brightness(0.3);" />
+          <h2 class="nl-wordmark">La Agenda<span>&#8209;NY</span></h2>
           <p>La Agenda-NY brings updates on community initiatives, advocacy, and ways to take action &mdash; straight to your inbox.</p>
           <form class="newsletter-form" onsubmit="handleNewsletterSubmit(event)">
             <label class="sr-only" for="newsletter-email">Email address</label>
@@ -367,7 +364,7 @@
               <h2 class="nl-archive-title">"&iexcl;No a Esencia!" echoes with solidarity and pride as NY-based Puerto Ricans join the call for civil resistance</h2>
               <p class="nl-archive-body">A coalition of diaspora organizations convened a rally that began in El Escambr&oacute;n, Puerto Rico and concluded on the steps of J.P. Morgan's NYC headquarters, opposing the proposed Esencia residential-tourist enclave in Cabo Rojo.</p>
               <div class="nl-archive-tags"><span class="nl-archive-tag">Housing</span><span class="nl-archive-tag">Advocacy</span></div>
-              <a class="nl-archive-link" href="newsletter.html">Read full issue &rarr;</a>
+              <a class="nl-archive-link" href="/la-agenda/no-a-esencia">Read the full issue &rarr;</a>
             </article>
           </div>
         </div>
@@ -381,7 +378,6 @@
       <div class="member-grid">
         <div class="reveal">
           <div class="section-head" style="margin-bottom:1.5rem;">
-            <div class="eyebrow">Join Us</div>
             <h2 class="h2">Become a Member</h2>
             <p class="lead">Join a community of change-makers dedicated to advancing Puerto Rican interests across New York, the U.S., and the island.</p>
           </div>
