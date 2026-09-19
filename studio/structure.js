@@ -1,6 +1,8 @@
-import {DocumentTextIcon} from '@sanity/icons'
+import {CalendarIcon, DocumentTextIcon} from '@sanity/icons'
 
-// Sidebar for writers: La Agenda first, everything else below.
+const LISTED = ['newsletter', 'event']
+
+// Sidebar for writers: La Agenda and the calendar first, everything else below.
 export const structure = (S) =>
   S.list()
     .title('Content')
@@ -14,6 +16,15 @@ export const structure = (S) =>
             .title('La Agenda issues')
             .defaultOrdering([{field: 'publishedAt', direction: 'desc'}]),
         ),
+      S.listItem()
+        .title('Calendar (events & flyers)')
+        .icon(CalendarIcon)
+        .schemaType('event')
+        .child(
+          S.documentTypeList('event')
+            .title('Events & flyers')
+            .defaultOrdering([{field: 'startDate', direction: 'desc'}]),
+        ),
       S.divider(),
-      ...S.documentTypeListItems().filter((item) => item.getId() !== 'newsletter'),
+      ...S.documentTypeListItems().filter((item) => !LISTED.includes(item.getId())),
     ])

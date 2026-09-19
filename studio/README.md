@@ -13,7 +13,7 @@ Sanity Studio for nprany.org. Writers use the hosted version at
 | Studio section | Where it shows up |
 | --- | --- |
 | La Agenda (newsletter) | `newsletter.html` archive, homepage "Recent Issues", and `issue.html?i=<page link>` for issues with a full article |
-| Event | Homepage "Upcoming Events" |
+| Calendar (events & flyers) | Monthly calendar on `members.html#events` (flyer popup per day, shareable `?day=YYYY-MM-DD` links) and the next three events on the homepage |
 | Site Settings | Homepage board intro text (`subtext`) |
 
 ## Developing
