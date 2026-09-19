@@ -20,6 +20,12 @@
       "has": [{ "type": "query", "key": "i", "value": "(?<slug>[a-z0-9-]+)" }],
       "destination": "/la-agenda/:slug",
       "permanent": true
+    },
+    {
+      "source": "/issue",
+      "has": [{ "type": "query", "key": "i", "value": "(?<slug>[a-z0-9-]+)" }],
+      "destination": "/la-agenda/:slug",
+      "permanent": true
     }
   ]
 }
